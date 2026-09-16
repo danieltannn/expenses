@@ -1,17 +1,6 @@
 {
   "transactions": [
     {
-      "id": "a978bd81-2e62-4e3c-b4d7-fd83eaded116",
-      "description": "Grab",
-      "category": "nan",
-      "type": "nan",
-      "amount": 2.1,
-      "date": "nan",
-      "card": "Citi Rewards",
-      "statementd": false,
-      "pending": false
-    },
-    {
       "id": "570912d3-23d3-41e3-918a-5ddece8f17c9",
       "description": "Grab",
       "category": "nan",
@@ -2462,7 +2451,7 @@
     },
     {
       "id": "96d4eb88-768a-40a7-8171-bbf0f3b9956d",
-      "description": "Dad’s Grab Dinner",
+      "description": "Dadâs Grab Dinner",
       "category": "Food",
       "type": "Expenses",
       "amount": 13.35,
