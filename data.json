@@ -1,28 +1,6 @@
 {
   "transactions": [
     {
-      "id": "5c270aa1-25ce-4465-9e0a-efe0d5a0f031",
-      "description": "Torbox",
-      "category": "Subscription",
-      "type": "nan",
-      "amount": 3.95,
-      "date": "nan",
-      "card": "Citi Rewards",
-      "statementd": false,
-      "pending": false
-    },
-    {
-      "id": "79b78bb7-eaa7-4d51-8de7-13c9a0235f36",
-      "description": "Grab",
-      "category": "nan",
-      "type": "nan",
-      "amount": 21.1,
-      "date": "nan",
-      "card": "Citi Rewards",
-      "statementd": false,
-      "pending": false
-    },
-    {
       "id": "16ff8c3e-210c-46f6-8d59-d22bafdb348a",
       "description": "Grab",
       "category": "nan",
