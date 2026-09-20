@@ -1,17 +1,6 @@
 {
   "transactions": [
     {
-      "id": "570912d3-23d3-41e3-918a-5ddece8f17c9",
-      "description": "Grab",
-      "category": "nan",
-      "type": "nan",
-      "amount": 28.7,
-      "date": "nan",
-      "card": "Citi Rewards",
-      "statementd": false,
-      "pending": false
-    },
-    {
       "id": "d4a8be08-c045-4989-a51c-9bcfb85a2f26",
       "description": "Spotify",
       "category": "Subscription",
