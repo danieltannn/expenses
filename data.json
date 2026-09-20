@@ -1,17 +1,6 @@
 {
   "transactions": [
     {
-      "id": "28bcb9bc-9615-434a-acde-40c980cbfae8",
-      "description": "Ryde",
-      "category": "Transport",
-      "type": "nan",
-      "amount": 42.52,
-      "date": "nan",
-      "card": "Citi Rewards",
-      "statementd": false,
-      "pending": false
-    },
-    {
       "id": "dfcd85ec-f375-498b-89ce-4e54c8089b21",
       "description": "Interest Earned",
       "category": "Lifestyle",
