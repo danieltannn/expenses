@@ -91,13 +91,23 @@ td{padding:11px 14px;vertical-align:middle;overflow:hidden;text-overflow:ellipsi
 .td-date{font-size:12px;color:var(--w2);font-variant-numeric:tabular-nums}
 .td-desc{font-size:13px;font-weight:500}
 .td-amt{text-align:right;font-family:var(--mono);font-size:12px;font-weight:500}
-.td-amt.out{color:var(--w1)}.td-amt.in{color:var(--w2)}
+.td-amt.out{color:#f43f5e}.td-amt.in{color:#4ade80}
 .tr-month td{background:var(--s1);padding:5px 14px;font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.5px;border-bottom:1px solid var(--b1);text-transform:uppercase;cursor:default;overflow:visible;white-space:normal}
 .tr-month:hover{background:var(--s1)!important}
 .tr-month:hover .td-desc{text-decoration:none!important}
 
 /* ── Pills & Badges ── */
-.pill{display:inline-flex;padding:2px 7px;border:1px solid var(--b2);font-size:11px;color:var(--w2);white-space:nowrap}
+.pill{display:inline-flex;padding:2px 8px;border:1px solid;font-size:11px;white-space:nowrap;border-radius:2px}
+/* Category pill colors */
+.p-food        {background:rgba(245,158,11,.12);color:#f59e0b;border-color:rgba(245,158,11,.25)}
+.p-transport   {background:rgba(56,189,248,.12);color:#38bdf8;border-color:rgba(56,189,248,.25)}
+.p-lifestyle   {background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.25)}
+.p-necessity   {background:rgba(52,211,153,.12);color:#34d399;border-color:rgba(52,211,153,.25)}
+.p-subscription{background:rgba(251,113,133,.12);color:#fb7185;border-color:rgba(251,113,133,.25)}
+.p-travel      {background:rgba(45,212,191,.12);color:#2dd4bf;border-color:rgba(45,212,191,.25)}
+.p-investments {background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.25)}
+.p-salary      {background:rgba(74,222,128,.12);color:#4ade80;border-color:rgba(74,222,128,.25)}
+.p-interest    {background:rgba(129,140,248,.12);color:#818cf8;border-color:rgba(129,140,248,.25)}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;font-size:11px;font-weight:500;white-space:nowrap;cursor:pointer;transition:opacity .15s}
 .badge:hover{opacity:.7}
 .b-pending{background:var(--w1);color:var(--bg)}
@@ -209,7 +219,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 .txc-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
 .txc-date{font-size:11px;color:var(--w3)}
 .txc-amt{font-family:var(--mono);font-size:14px;font-weight:600;white-space:nowrap;padding-left:12px}
-.txc-amt.out{color:var(--w1)}.txc-amt.in{color:var(--w2)}
+.txc-amt.out{color:#f43f5e}.txc-amt.in{color:#4ade80}
 .txc-desc{font-size:13px;font-weight:500;margin-bottom:6px;padding-right:30px}
 .txc-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .txc-del{background:none;border:none;color:var(--w4);cursor:pointer;font-size:15px;padding:3px 6px;margin-left:auto;transition:color .15s;font-family:var(--font)}
@@ -647,12 +657,15 @@ function renderStats() {
     document.getElementById('s2Lbl').textContent='Money In';
     document.getElementById('s3Lbl').textContent='Net';
     document.getElementById('sOut').textContent=fmt(out);
+    document.getElementById('sOut').style.color='#f43f5e';
     document.getElementById('sOutN').textContent=oc+' transaction'+(oc!==1?'s':'');
     document.getElementById('sIn').textContent=fmt(inc);
+    document.getElementById('sIn').style.color='#4ade80';
     document.getElementById('sInN').textContent=ic+' transaction'+(ic!==1?'s':'');
     const ne=document.getElementById('sNet');
     ne.textContent=(net>=0?'+':'−')+fmt(Math.abs(net));
-    ne.className='stat-val'+(Math.abs(net)<0.01?' dim':'');
+    ne.style.color = net>=0 ? '#4ade80' : '#f43f5e';
+    ne.className='stat-val';
     document.getElementById('sNetN').textContent=src.length+' transactions';
   }
 }
@@ -666,6 +679,15 @@ function renderMeta() {
 }
 
 // ═══ Transaction Table ══════════════════════════════════════════
+const CAT_CLASS = {
+  Food:'p-food', Transport:'p-transport', Lifestyle:'p-lifestyle',
+  Necessity:'p-necessity', Subscription:'p-subscription', Travel:'p-travel',
+  Investments:'p-investments', Salary:'p-salary', Interest:'p-interest',
+};
+function catPill(cat) {
+  const cls = CAT_CLASS[cat] || '';
+  return `<span class="pill ${cls}">${esc(cat)}</span>`;
+}
 function ccBadge(t) {
   if(!CC.has(t.card)) return ''; // debit is always settled — no badge needed, it's implied
   const id=esc(t.id);
@@ -689,7 +711,7 @@ function renderTable() {
     rows+=`<tr class="tr-tx" onclick="openEdit('${id}')">
       <td class="td-date">${fmtDay(t.date)}</td>
       <td class="td-desc">${esc(t.description)}</td>
-      <td><span class="pill">${esc(t.category)}</span></td>
+      <td>${catPill(t.category)}</td>
       <td class="card-tag">${esc(t.card)}</td>
       <td>${ccBadge(t)}</td>
       <td class="td-amt ${isOut?'out':'in'}">${isOut?'−':'+'} ${fmt(t.amount)}</td>
@@ -722,7 +744,7 @@ function renderTable() {
       </div>
       <div class="txc-desc">${esc(t.description)}</div>
       <div class="txc-meta">
-        <span class="pill">${esc(t.category)}</span>
+        ${catPill(t.category)}
         <span class="card-tag">${esc(t.card)}</span>
         ${ccBadge(t)}
         <button class="txc-del" onclick="event.stopPropagation();deleteTx('${id}')">×</button>
