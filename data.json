@@ -1467,7 +1467,7 @@
       "id": "adaff952-28ee-4ead-93a5-61b1fd3b8550",
       "description": "Salary",
       "category": "Salary",
-      "type": "Gain",
+      "type": "Salary",
       "amount": 9795.06,
       "date": "2026-07-09",
       "card": "DBS Debit"
@@ -2359,7 +2359,7 @@
     },
     {
       "id": "96d4eb88-768a-40a7-8171-bbf0f3b9956d",
-      "description": "DadÃÂÃÂ¢ÃÂÃÂÃÂÃÂs Grab Dinner",
+      "description": "DadÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂs Grab Dinner",
       "category": "Food",
       "type": "Expenses",
       "amount": 13.35,
