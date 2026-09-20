@@ -66,6 +66,15 @@ select.fi option{background:var(--s2)}
 /* ── Generic table styles (shared by transactions + subs) ── */
 .panel{border:1px solid var(--b1);background:var(--bg);overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:640px}
+/* Transaction table: fixed layout so columns always show */
+.tx-table{table-layout:fixed}
+.tx-table .col-date{width:110px}
+.tx-table .col-desc{} /* takes the rest */
+.tx-table .col-cat {width:110px}
+.tx-table .col-card{width:120px}
+.tx-table .col-sta {width:130px}
+.tx-table .col-amt {width:120px;text-align:right}
+.tx-table .col-del {width:36px}
 thead th{background:var(--s1);border-bottom:1px solid var(--b1);padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
 thead th:hover{color:var(--w2)}
 thead th.active{color:var(--w1)}
@@ -73,17 +82,17 @@ thead th.asc::after{content:' ↑'}
 thead th.desc::after{content:' ↓'}
 tbody tr{border-bottom:1px solid var(--b1);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
-td{padding:11px 14px;vertical-align:middle}
+td{padding:11px 14px;vertical-align:middle;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* ── Transaction table ── */
 .tr-tx{cursor:pointer}
 .tr-tx:hover{background:var(--s2)}
 .tr-tx:hover .td-desc{text-decoration:underline;text-underline-offset:2px}
-.td-date{font-size:12px;color:var(--w2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.td-date{font-size:12px;color:var(--w2);font-variant-numeric:tabular-nums}
 .td-desc{font-size:13px;font-weight:500}
-.td-amt{text-align:right;white-space:nowrap;font-family:var(--mono);font-size:12px;font-weight:500}
+.td-amt{text-align:right;font-family:var(--mono);font-size:12px;font-weight:500}
 .td-amt.out{color:var(--w1)}.td-amt.in{color:var(--w2)}
-.tr-month td{background:var(--s1);padding:5px 14px;font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.5px;border-bottom:1px solid var(--b1);text-transform:uppercase;cursor:default}
+.tr-month td{background:var(--s1);padding:5px 14px;font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.5px;border-bottom:1px solid var(--b1);text-transform:uppercase;cursor:default;overflow:visible;white-space:normal}
 .tr-month:hover{background:var(--s1)!important}
 .tr-month:hover .td-desc{text-decoration:none!important}
 
@@ -591,12 +600,14 @@ function render() {
     if(type&&t.type!==type) return false;
     if(st){
       const isCC=CC.has(t.card);
-      if(st==='debit'&&isCC) return false;
-      if(st==='debit'&&!isCC) return true;
-      if(!isCC) return false;
-      if(st==='pending'&&!t.pending) return false;
-      if(st==='stmtd'&&!t.statementd) return false;
-      if(st==='clearing'&&(t.statementd||t.pending)) return false;
+      if(st==='debit' &&  isCC) return false;
+      if(st==='debit' && !isCC) return true;
+      // For CC-specific statuses: debit counts as always statemeneted, excluded from pending/confirmed
+      if(st==='stmtd'  && !isCC) return true;   // debit = always statemeneted ✓
+      if(!isCC) return false;                     // debit excluded from pending/confirmed filters
+      if(st==='pending'  && !t.pending)              return false;
+      if(st==='stmtd'    && !t.statementd)           return false;
+      if(st==='clearing' && (t.statementd||t.pending)) return false;
     }
     return true;
   });
@@ -640,7 +651,7 @@ function renderStats() {
     document.getElementById('sIn').textContent=fmt(inc);
     document.getElementById('sInN').textContent=ic+' transaction'+(ic!==1?'s':'');
     const ne=document.getElementById('sNet');
-    ne.textContent=(net>=0?'+':'')+fmt(Math.abs(net));
+    ne.textContent=(net>=0?'+':'−')+fmt(Math.abs(net));
     ne.className='stat-val'+(Math.abs(net)<0.01?' dim':'');
     document.getElementById('sNetN').textContent=src.length+' transactions';
   }
@@ -656,10 +667,8 @@ function renderMeta() {
 
 // ═══ Transaction Table ══════════════════════════════════════════
 function ccBadge(t) {
+  if(!CC.has(t.card)) return ''; // debit is always settled — no badge needed, it's implied
   const id=esc(t.id);
-  // DBS Debit: always settled instantly — show static Statemeneted, no interaction
-  if(!CC.has(t.card)) return `<span class="badge b-stmtd" style="cursor:default;opacity:.5">✓ Statemeneted</span>`;
-  // Credit card: Pending → Confirmed → Statemeneted (click to advance)
   if(t.pending)    return `<span class="badge b-pending" onclick="event.stopPropagation();cycleBadge('${id}')" title="Click to advance">● Pending</span>`;
   if(t.statementd) return `<span class="badge b-stmtd"  onclick="event.stopPropagation();cycleBadge('${id}')" title="Click to advance">✓ Statemeneted</span>`;
   return                   `<span class="badge b-confirm" onclick="event.stopPropagation();cycleBadge('${id}')" title="Click to advance">○ Confirmed</span>`;
@@ -687,15 +696,15 @@ function renderTable() {
       <td style="width:36px"><button class="del-btn" onclick="event.stopPropagation();deleteTx('${id}')" title="Delete">×</button></td>
     </tr>`;
   });
-  const tableHtml=`<table>
+  const tableHtml=`<table class="tx-table">
     <thead><tr>
-      <th class="${thCls('date',sortK,sortD)}"        onclick="toggleSort('date')">Date</th>
-      <th class="${thCls('description',sortK,sortD)}" onclick="toggleSort('description')">Description</th>
-      <th class="${thCls('category',sortK,sortD)}"    onclick="toggleSort('category')">Category</th>
-      <th class="${thCls('card',sortK,sortD)}"         onclick="toggleSort('card')">Card</th>
-      <th>Status</th>
-      <th class="${thCls('amount',sortK,sortD)}"      onclick="toggleSort('amount')" style="text-align:right">Amount</th>
-      <th style="width:36px"></th>
+      <th class="col-date ${thCls('date',sortK,sortD)}"        onclick="toggleSort('date')">Date</th>
+      <th class="col-desc ${thCls('description',sortK,sortD)}" onclick="toggleSort('description')">Description</th>
+      <th class="col-cat  ${thCls('category',sortK,sortD)}"    onclick="toggleSort('category')">Category</th>
+      <th class="col-card ${thCls('card',sortK,sortD)}"         onclick="toggleSort('card')">Card</th>
+      <th class="col-sta">Status</th>
+      <th class="col-amt  ${thCls('amount',sortK,sortD)}"      onclick="toggleSort('amount')">Amount</th>
+      <th class="col-del"></th>
     </tr></thead>
     <tbody>${rows}</tbody></table>`;
 
