@@ -48,13 +48,13 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 .stat-sub{font-size:11px;color:var(--w3);margin-top:4px}
 
 /* ── Filters ── */
-.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;background:var(--s1);border:1px solid var(--b1);margin-bottom:10px}
+.filters{padding:8px 12px;background:var(--s1);border:1px solid var(--b1);margin-bottom:10px}
+.f-drops{display:flex;gap:5px;align-items:center}
+.f-drops .fi{flex:1;min-width:0;font-size:11px;padding:5px 6px}
 .fi{background:var(--bg);border:1px solid var(--b2);color:var(--w1);padding:6px 10px;font-size:12px;font-family:var(--font);outline:none;transition:border-color .15s}
 .fi:focus{border-color:var(--w1)}
-.fi-search{flex:1;min-width:140px}
-select.fi{cursor:pointer;min-width:120px}
 select.fi option{background:var(--s2)}
-.fi-reset{background:none;border:none;color:var(--w3);font-size:11px;cursor:pointer;padding:4px 6px;font-family:var(--font);transition:color .15s}
+.fi-reset{background:none;border:none;color:var(--w3);font-size:13px;cursor:pointer;padding:4px 8px;font-family:var(--font);transition:color .15s;flex-shrink:0}
 .fi-reset:hover{color:var(--w1)}
 
 /* ── View bar ── */
@@ -64,8 +64,8 @@ select.fi option{background:var(--s2)}
 .tabs .btn{border-radius:0;margin-left:-1px;padding:5px 14px;font-size:11px}
 
 /* ── Generic table styles (shared by transactions + subs) ── */
-.panel{border:1px solid var(--b1);background:var(--bg)}
-table{width:100%;border-collapse:collapse}
+.panel{border:1px solid var(--b1);background:var(--bg);overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
 thead th{background:var(--s1);border-bottom:1px solid var(--b1);padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
 thead th:hover{color:var(--w2)}
 thead th.active{color:var(--w1)}
@@ -192,19 +192,52 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.bad{background:var(--bg);color:var(--w1);border:1px solid var(--w1)}
 
+/* ── Mobile transaction cards (shown on mobile, hidden on desktop) ── */
+.tbl-desktop{display:block}
+.tbl-mobile{display:none}
+.tx-card{padding:12px 14px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s}
+.tx-card:hover,.tx-card:active{background:var(--s2)}
+.txc-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.txc-date{font-size:11px;color:var(--w3)}
+.txc-amt{font-family:var(--mono);font-size:14px;font-weight:600;white-space:nowrap;padding-left:12px}
+.txc-amt.out{color:var(--w1)}.txc-amt.in{color:var(--w2)}
+.txc-desc{font-size:13px;font-weight:500;margin-bottom:6px;padding-right:30px}
+.txc-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.txc-del{background:none;border:none;color:var(--w4);cursor:pointer;font-size:15px;padding:3px 6px;margin-left:auto;transition:color .15s;font-family:var(--font)}
+.txc-del:hover{color:var(--w1)}
+.mo-sep{padding:5px 14px;font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--b1);background:var(--s1)}
+
 /* ── Mobile ── */
-@media(max-width:680px){
-  .wrap{padding:12px 12px 80px}
-  .stats{grid-template-columns:1fr 1fr}
-  .stats .stat:last-child{grid-column:1/-1}
+@media(max-width:700px){
+  .wrap{padding:10px 10px 80px}
+  /* Stats: 3 columns but tiny */
+  .stat{padding:10px 12px}
+  .stat-val{font-size:16px}
+  .stat-lbl{font-size:9px}
+  .stat-sub{font-size:10px}
   .subs-summary{grid-template-columns:1fr 1fr}
   .subs-summary .ss-cell:last-child{grid-column:1/-1}
-  .col-card,.col-status,.col-meq{display:none}
+  /* Filters: wrap to 2 cols on mobile */
+  .f-drops{flex-wrap:wrap}
+  .f-drops .fi{min-width:calc(50% - 3px);flex:none}
+  /* View bar: stack tabs below meta */
+  .view-bar{flex-direction:column;gap:6px;align-items:stretch}
+  .tabs{overflow-x:auto;display:flex}
+  .tabs .btn{flex:1;font-size:10px;padding:7px 4px;text-align:center;white-space:nowrap}
+  /* Switch to card layout */
+  .tbl-desktop{display:none}
+  .tbl-mobile{display:block}
+  /* Modal: slide up from bottom */
   .modal{align-self:flex-end;width:100%;max-width:100%;border-bottom:none}
   .overlay{align-items:flex-end}
   .fr{grid-template-columns:1fr}
+  /* Chart */
   .chart-inner{flex-direction:column}
   .chart-donut-col{border-right:none;border-bottom:1px solid var(--b1)}
+  /* Subscriptions */
+  .col-meq{display:none}
+  /* FAB bigger tap target */
+  .fab{bottom:16px;right:16px;width:52px;height:52px}
 }
 </style>
 </head>
@@ -229,31 +262,32 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 
   <!-- Filters (table-only) -->
   <div class="filters" id="filtersBar">
-    <input  class="fi fi-search" type="text" id="fSearch"  placeholder="Search…"    oninput="render()">
-    <select class="fi"                        id="fMonth"   onchange="render()"><option value="">All months</option></select>
-    <select class="fi"                        id="fCat"     onchange="render()">
-      <option value="">All categories</option>
-      <option>Food</option><option>Transport</option><option>Lifestyle</option>
-      <option>Necessity</option><option>Subscription</option><option>Travel</option>
-      <option>Investments</option><option>Salary</option><option>Interest</option>
-    </select>
-    <select class="fi"                        id="fCard"    onchange="render()">
-      <option value="">All cards</option>
-      <option>DBS Debit</option><option>Citi Rewards</option>
-      <option>HSBC</option><option>Trust</option><option>UOB Ladys</option>
-    </select>
-    <select class="fi"                        id="fType"    onchange="render()">
-      <option value="">All types</option>
-      <option>Expenses</option><option>Gain</option><option>Investments</option><option>Salary</option>
-    </select>
-    <select class="fi"                        id="fStatus"  onchange="render()">
-      <option value="">All statuses</option>
-      <option value="stmtd">Statemeneted</option>
-      <option value="pending">Pending</option>
-      <option value="clearing">Confirmed</option>
-      <option value="debit">Debit only</option>
-    </select>
-    <button class="fi-reset" onclick="resetFilters()">✕ Reset</button>
+    <div class="f-drops" id="fDrops">
+      <select class="fi" id="fMonth" onchange="render()"><option value="">All months</option></select>
+      <select class="fi" id="fCat" onchange="render()">
+        <option value="">All categories</option>
+        <option>Food</option><option>Transport</option><option>Lifestyle</option>
+        <option>Necessity</option><option>Subscription</option><option>Travel</option>
+        <option>Investments</option><option>Salary</option><option>Interest</option>
+      </select>
+      <select class="fi" id="fCard" onchange="render()">
+        <option value="">All cards</option>
+        <option>DBS Debit</option><option>Citi Rewards</option>
+        <option>HSBC</option><option>Trust</option><option>UOB Ladys</option>
+      </select>
+      <select class="fi" id="fType" onchange="render()">
+        <option value="">All types</option>
+        <option>Expenses</option><option>Gain</option><option>Investments</option><option>Salary</option>
+      </select>
+      <select class="fi" id="fStatus" onchange="render()">
+        <option value="">All statuses</option>
+        <option value="stmtd">Statemeneted</option>
+        <option value="pending">Pending</option>
+        <option value="clearing">Confirmed</option>
+        <option value="debit">Debit only</option>
+      </select>
+      <button class="fi-reset" onclick="resetFilters()">✕</button>
+    </div>
   </div>
 
   <!-- View bar -->
@@ -544,7 +578,6 @@ function rebuildMonthFilter() {
   months.forEach(m=>{const[y,mo]=m.split('-');const lbl=new Date(+y,+mo-1,1).toLocaleString('en-SG',{month:'long',year:'numeric'});sel.innerHTML+=`<option value="${m}">${lbl}</option>`;});
 }
 function render() {
-  const search=document.getElementById('fSearch').value.toLowerCase();
   const month =document.getElementById('fMonth').value;
   const cat   =document.getElementById('fCat').value;
   const card  =document.getElementById('fCard').value;
@@ -552,7 +585,6 @@ function render() {
   const st    =document.getElementById('fStatus').value;
 
   view=txs.filter(t=>{
-    if(search&&!t.description.toLowerCase().includes(search)&&!t.category.toLowerCase().includes(search)&&!t.card.toLowerCase().includes(search)) return false;
     if(month&&!t.date.startsWith(month)) return false;
     if(cat&&t.category!==cat) return false;
     if(card&&t.card!==card) return false;
@@ -577,7 +609,7 @@ function render() {
   else renderSubs();
 }
 function toggleSort(k) { if(sortK===k) sortD*=-1; else{sortK=k;sortD=-1;} render(); }
-function resetFilters() { ['fSearch','fMonth','fCat','fCard','fType','fStatus'].forEach(id=>{document.getElementById(id).value='';}); render(); }
+function resetFilters() { ['fMonth','fCat','fCard','fType','fStatus'].forEach(id=>{document.getElementById(id).value='';}); render(); }
 
 // ═══ Stats ═════════════════════════════════════════════════════
 function renderStats() {
@@ -637,33 +669,59 @@ function thCls(k,cur,dir) { return cur===k?'active '+(dir===-1?'desc':'asc'):'';
 function renderTable() {
   const el=document.getElementById('tblWrap');
   if(!view.length){el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No transactions match.<br><strong>Reset filters</strong> or add one.</p></div>`;return;}
+
+  // ── Desktop table ──────────────────────────────────────
   let rows='',lastMo='';
   view.forEach(t=>{
     const mo=t.date.slice(0,7);
-    if(mo!==lastMo&&sortK==='date'){rows+=`<tr class="tr-month"><td colspan="8">${fmtMo(mo)}</td></tr>`;lastMo=mo;}
+    if(mo!==lastMo&&sortK==='date'){rows+=`<tr class="tr-month"><td colspan="7">${fmtMo(mo)}</td></tr>`;lastMo=mo;}
     const isOut=t.type==='Expenses'||t.type==='Investments';
     const id=esc(t.id);
     rows+=`<tr class="tr-tx" onclick="openEdit('${id}')">
       <td class="td-date">${fmtDay(t.date)}</td>
       <td class="td-desc">${esc(t.description)}</td>
       <td><span class="pill">${esc(t.category)}</span></td>
-      <td class="col-card card-tag">${esc(t.card)}</td>
-      <td class="col-status">${ccBadge(t)}</td>
+      <td class="card-tag">${esc(t.card)}</td>
+      <td>${ccBadge(t)}</td>
       <td class="td-amt ${isOut?'out':'in'}">${isOut?'−':'+'} ${fmt(t.amount)}</td>
       <td style="width:36px"><button class="del-btn" onclick="event.stopPropagation();deleteTx('${id}')" title="Delete">×</button></td>
     </tr>`;
   });
-  el.innerHTML=`<table>
+  const tableHtml=`<table>
     <thead><tr>
       <th class="${thCls('date',sortK,sortD)}"        onclick="toggleSort('date')">Date</th>
       <th class="${thCls('description',sortK,sortD)}" onclick="toggleSort('description')">Description</th>
       <th class="${thCls('category',sortK,sortD)}"    onclick="toggleSort('category')">Category</th>
-      <th class="col-card ${thCls('card',sortK,sortD)}" onclick="toggleSort('card')">Card</th>
-      <th class="col-status">Status</th>
+      <th class="${thCls('card',sortK,sortD)}"         onclick="toggleSort('card')">Card</th>
+      <th>Status</th>
       <th class="${thCls('amount',sortK,sortD)}"      onclick="toggleSort('amount')" style="text-align:right">Amount</th>
       <th style="width:36px"></th>
     </tr></thead>
     <tbody>${rows}</tbody></table>`;
+
+  // ── Mobile cards ───────────────────────────────────────
+  let cards='',lastMoC='';
+  view.forEach(t=>{
+    const mo=t.date.slice(0,7);
+    if(mo!==lastMoC&&sortK==='date'){cards+=`<div class="mo-sep">${fmtMo(mo)}</div>`;lastMoC=mo;}
+    const isOut=t.type==='Expenses'||t.type==='Investments';
+    const id=esc(t.id);
+    cards+=`<div class="tx-card" onclick="openEdit('${id}')">
+      <div class="txc-row1">
+        <span class="txc-date">${fmtDay(t.date)}</span>
+        <span class="txc-amt ${isOut?'out':'in'}">${isOut?'−':'+'} ${fmt(t.amount)}</span>
+      </div>
+      <div class="txc-desc">${esc(t.description)}</div>
+      <div class="txc-meta">
+        <span class="pill">${esc(t.category)}</span>
+        <span class="card-tag">${esc(t.card)}</span>
+        ${ccBadge(t)}
+        <button class="txc-del" onclick="event.stopPropagation();deleteTx('${id}')">×</button>
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML=`<div class="tbl-desktop">${tableHtml}</div><div class="tbl-mobile">${cards}</div>`;
 }
 
 // ═══ Subscriptions View ════════════════════════════════════════
