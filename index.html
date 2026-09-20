@@ -169,6 +169,7 @@ input,select{background:var(--bg);border:1px solid var(--b2);color:var(--w1);pad
 input:focus,select:focus{border-color:var(--w1)}
 select{cursor:pointer}
 select option{background:var(--s2)}
+select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 .cc-block{background:var(--bg);border:1px solid var(--b2);border-left:2px solid var(--w1);padding:12px 14px;display:flex;flex-direction:column;gap:11px}
 .cc-lbl{font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--w2)}
 .tog-row{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--w1)}
@@ -295,7 +296,7 @@ select option{background:var(--s2)}
       <div class="fg"><label>Description</label><input type="text" id="fDesc" placeholder="What was this?"></div>
       <div class="fr">
         <div class="fg"><label>Category</label>
-          <select id="fCatF">
+          <select id="fCatF" onchange="autoType()">
             <option>Food</option><option>Transport</option><option>Lifestyle</option>
             <option>Necessity</option><option>Subscription</option><option>Travel</option>
             <option>Investments</option><option>Salary</option><option>Interest</option>
@@ -731,7 +732,8 @@ function subSort(k) {
 
 // ═══ Chart ═════════════════════════════════════════════════════
 function getPayPeriods() {
-  const salaries=txs.filter(t=>t.type==='Salary').sort((a,b)=>a.date.localeCompare(b.date));
+  // Match by category so it works regardless of which Type the user set
+  const salaries=txs.filter(t=>t.category==='Salary').sort((a,b)=>a.date.localeCompare(b.date));
   const expenses=txs.filter(t=>t.type==='Expenses'||t.type==='Investments');
   const periods=[];
   if(!salaries.length){const total=expenses.reduce((s,t)=>s+t.amount,0);return[{label:'All expenses',shortLabel:'All',amount:total,count:expenses.length}];}
@@ -803,6 +805,30 @@ function updateCC() {
   const card=document.getElementById('fCardF').value;
   document.getElementById('ccBlock').style.display=CC.has(card)?'flex':'none';
 }
+// Auto-set Type when Category is picked — keeps them in sync so chart detection works
+// Called on category change (onchange) and when opening the modal.
+// For Salary / Investments: locks the type to the matching value.
+// For everything else: shows only Expenses and Gain, preserves the
+// existing selection when editing if it's valid (Gain stays Gain).
+function syncType(existingType) {
+  const cat = document.getElementById('fCatF').value;
+  const sel = document.getElementById('fTypeF');
+
+  if (cat === 'Salary') {
+    sel.innerHTML = '<option value="Salary">Salary</option>';
+    sel.disabled  = true;
+  } else if (cat === 'Investments') {
+    sel.innerHTML = '<option value="Investments">Investments</option>';
+    sel.disabled  = true;
+  } else {
+    sel.innerHTML = '<option value="Expenses">Expenses</option><option value="Gain">Gain</option>';
+    sel.disabled  = false;
+    // Default: keep Gain when editing a Gain tx, or when Interest category; otherwise Expenses
+    sel.value = (existingType === 'Gain' || cat === 'Interest') ? 'Gain' : 'Expenses';
+  }
+}
+// Called by the category <select onchange> — no prior type to preserve
+function autoType() { syncType(null); }
 function openAdd() {
   document.getElementById('mAddTitle').textContent='New transaction';
   document.getElementById('fId').value='';
@@ -810,7 +836,7 @@ function openAdd() {
   document.getElementById('fAmt').value='';
   document.getElementById('fDesc').value='';
   document.getElementById('fCatF').value='Food';
-  document.getElementById('fTypeF').value='Expenses';
+  syncType(null);  // sets Type to Expenses, unlocks the field
   document.getElementById('fCardF').value='DBS Debit';
   document.getElementById('fStmtd').checked=false;
   document.getElementById('fPending').checked=false;
@@ -826,7 +852,7 @@ function openEdit(id) {
   document.getElementById('fAmt').value=t.amount;
   document.getElementById('fDesc').value=t.description;
   document.getElementById('fCatF').value=t.category;
-  document.getElementById('fTypeF').value=t.type;
+  syncType(t.type);  // locks if Salary/Investments, otherwise keeps Gain/Expenses correctly
   document.getElementById('fCardF').value=t.card;
   document.getElementById('fStmtd').checked=!!t.statementd;
   document.getElementById('fPending').checked=!!t.pending;
@@ -843,8 +869,8 @@ async function saveTx() {
   if(!desc||isNaN(amt)||amt<0||!date){toast('Fill in all required fields','bad');return;}
   const t={id:id||crypto.randomUUID(),description:desc,category:document.getElementById('fCatF').value,type:document.getElementById('fTypeF').value,amount:amt,date,card};
   if(CC.has(card)){t.statementd=document.getElementById('fStmtd').checked;t.pending=document.getElementById('fPending').checked;}
-  const isNewSalary = !id && t.type === 'Salary';
-  const isEditSalary = !!id && t.type === 'Salary';
+  const isNewSalary  = !id  && t.category === 'Salary';
+  const isEditSalary = !!id && t.category === 'Salary';
   if(id){const i=txs.findIndex(x=>x.id===id);if(i>=0)txs[i]=t;else txs.unshift(t);}else txs.unshift(t);
   txs.sort((a,b)=>b.date.localeCompare(a.date));
   closeModal('mAdd'); rebuildMonthFilter(); render();
@@ -858,7 +884,7 @@ async function saveTx() {
 }
 async function deleteTx(id) {
   if(!confirm('Delete this transaction?')) return;
-  const wasSalary = txs.find(t=>t.id===id)?.type === 'Salary';
+  const wasSalary = txs.find(t=>t.id===id)?.category === 'Salary';
   txs=txs.filter(t=>t.id!==id); rebuildMonthFilter(); render();
   if (wasSalary) {
     toast('Pay period removed');
