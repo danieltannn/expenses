@@ -92,8 +92,13 @@ td{padding:11px 14px;vertical-align:middle}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;font-size:11px;font-weight:500;white-space:nowrap;cursor:pointer;transition:opacity .15s}
 .badge:hover{opacity:.7}
 .b-pending{background:var(--w1);color:var(--bg)}
-.b-stmtd{border:1px solid var(--w1);color:var(--w1)}
-.b-clear{border:1px dashed var(--w3);color:var(--w3)}
+.b-confirm{border:1px solid var(--w2);color:var(--w2)}
+.b-stmtd{border:1px dashed var(--b3);color:var(--w3)}
+.cc-status-row{display:flex;gap:0;margin-top:2px}
+.cc-status-btn{flex:1;padding:7px 4px;background:transparent;border:1px solid var(--b2);color:var(--w3);font-size:11px;font-family:var(--font);cursor:pointer;transition:all .15s;margin-left:-1px;text-align:center}
+.cc-status-btn:first-child{margin-left:0}
+.cc-status-btn:hover{border-color:var(--w2);color:var(--w2)}
+.cc-status-btn.active{background:var(--w1);color:var(--bg);border-color:var(--w1);font-weight:600}
 .card-tag{font-size:12px;color:var(--w2);white-space:nowrap}
 .del-btn{background:none;border:none;color:var(--w4);cursor:pointer;padding:4px 6px;font-size:14px;transition:color .15s;line-height:1;font-family:var(--font)}
 .del-btn:hover{color:var(--w1)}
@@ -245,7 +250,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
       <option value="">All statuses</option>
       <option value="stmtd">Statemeneted</option>
       <option value="pending">Pending</option>
-      <option value="clearing">Clearing</option>
+      <option value="clearing">Confirmed</option>
       <option value="debit">Debit only</option>
     </select>
     <button class="fi-reset" onclick="resetFilters()">✕ Reset</button>
@@ -316,8 +321,11 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
       </div>
       <div class="cc-block" id="ccBlock" style="display:none">
         <div class="cc-lbl">Credit card status</div>
-        <div class="tog-row"><span>Statemeneted</span><label class="tog"><input type="checkbox" id="fStmtd"><span class="tog-sl"></span></label></div>
-        <div class="tog-row"><span>Pending charge</span><label class="tog"><input type="checkbox" id="fPending"><span class="tog-sl"></span></label></div>
+        <div class="cc-status-row">
+          <button type="button" class="cc-status-btn" data-s="pending"    onclick="setStatusBtn('pending')">● Pending</button>
+          <button type="button" class="cc-status-btn" data-s="confirmed"  onclick="setStatusBtn('confirmed')">○ Confirmed</button>
+          <button type="button" class="cc-status-btn" data-s="stmtd"     onclick="setStatusBtn('stmtd')">✓ Statemeneted</button>
+        </div>
       </div>
       <div class="form-acts">
         <button class="btn" onclick="closeModal('mAdd')">Cancel</button>
@@ -616,11 +624,13 @@ function renderMeta() {
 
 // ═══ Transaction Table ══════════════════════════════════════════
 function ccBadge(t) {
-  if(!CC.has(t.card)) return '';
   const id=esc(t.id);
-  if(t.pending)    return `<span class="badge b-pending" onclick="event.stopPropagation();cycleBadge('${id}')" title="Cycle status">● Pending</span>`;
-  if(t.statementd) return `<span class="badge b-stmtd"   onclick="event.stopPropagation();cycleBadge('${id}')" title="Cycle status">✓ Statemeneted</span>`;
-  return                   `<span class="badge b-clear"   onclick="event.stopPropagation();cycleBadge('${id}')" title="Cycle status">◌ Clearing</span>`;
+  // DBS Debit: always settled instantly — show static Statemeneted, no interaction
+  if(!CC.has(t.card)) return `<span class="badge b-stmtd" style="cursor:default;opacity:.5">✓ Statemeneted</span>`;
+  // Credit card: Pending → Confirmed → Statemeneted (click to advance)
+  if(t.pending)    return `<span class="badge b-pending" onclick="event.stopPropagation();cycleBadge('${id}')" title="Click to advance">● Pending</span>`;
+  if(t.statementd) return `<span class="badge b-stmtd"  onclick="event.stopPropagation();cycleBadge('${id}')" title="Click to advance">✓ Statemeneted</span>`;
+  return                   `<span class="badge b-confirm" onclick="event.stopPropagation();cycleBadge('${id}')" title="Click to advance">○ Confirmed</span>`;
 }
 function thCls(k,cur,dir) { return cur===k?'active '+(dir===-1?'desc':'asc'):''; }
 
@@ -801,10 +811,32 @@ function closeModal(id) { document.getElementById(id).classList.add('off'); }
 document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.add('off');}));
 
 // ── Transaction CRUD ──
+// Show/hide CC status block based on selected card; default to Pending for new CC txs
 function updateCC() {
   const card=document.getElementById('fCardF').value;
-  document.getElementById('ccBlock').style.display=CC.has(card)?'flex':'none';
+  const isCC=CC.has(card);
+  document.getElementById('ccBlock').style.display=isCC?'flex':'none';
+  // When switching TO a CC card on a blank form, default to Pending
+  if(isCC && !document.querySelector('.cc-status-btn.active')) setStatusBtn('pending');
 }
+
+// Segmented status selector helpers
+function setStatusBtn(which) {
+  document.querySelectorAll('.cc-status-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.s===which);
+  });
+}
+function getStatusFromBtns() {
+  const btn=document.querySelector('.cc-status-btn.active');
+  const s=btn?btn.dataset.s:'pending';
+  return { pending:s==='pending', statementd:s==='stmtd' };
+}
+function setStatusFromTx(t) {
+  if(t.pending)    setStatusBtn('pending');
+  else if(t.statementd) setStatusBtn('stmtd');
+  else             setStatusBtn('confirmed');
+}
+
 // Auto-set Type when Category is picked — keeps them in sync so chart detection works
 // Called on category change (onchange) and when opening the modal.
 // For Salary / Investments: locks the type to the matching value.
@@ -823,12 +855,11 @@ function syncType(existingType) {
   } else {
     sel.innerHTML = '<option value="Expenses">Expenses</option><option value="Gain">Gain</option>';
     sel.disabled  = false;
-    // Default: keep Gain when editing a Gain tx, or when Interest category; otherwise Expenses
     sel.value = (existingType === 'Gain' || cat === 'Interest') ? 'Gain' : 'Expenses';
   }
 }
-// Called by the category <select onchange> — no prior type to preserve
 function autoType() { syncType(null); }
+
 function openAdd() {
   document.getElementById('mAddTitle').textContent='New transaction';
   document.getElementById('fId').value='';
@@ -836,10 +867,10 @@ function openAdd() {
   document.getElementById('fAmt').value='';
   document.getElementById('fDesc').value='';
   document.getElementById('fCatF').value='Food';
-  syncType(null);  // sets Type to Expenses, unlocks the field
+  syncType(null);
   document.getElementById('fCardF').value='DBS Debit';
-  document.getElementById('fStmtd').checked=false;
-  document.getElementById('fPending').checked=false;
+  // Clear any active status button, then hide CC block (DBS Debit default)
+  document.querySelectorAll('.cc-status-btn').forEach(b=>b.classList.remove('active'));
   updateCC();
   openModal('mAdd');
   setTimeout(()=>document.getElementById('fDesc').focus(),80);
@@ -852,11 +883,11 @@ function openEdit(id) {
   document.getElementById('fAmt').value=t.amount;
   document.getElementById('fDesc').value=t.description;
   document.getElementById('fCatF').value=t.category;
-  syncType(t.type);  // locks if Salary/Investments, otherwise keeps Gain/Expenses correctly
+  syncType(t.type);
   document.getElementById('fCardF').value=t.card;
-  document.getElementById('fStmtd').checked=!!t.statementd;
-  document.getElementById('fPending').checked=!!t.pending;
-  updateCC();
+  // Set status buttons from the transaction's data
+  if(CC.has(t.card)) { updateCC(); setStatusFromTx(t); }
+  else               { document.getElementById('ccBlock').style.display='none'; }
   openModal('mAdd');
   setTimeout(()=>document.getElementById('fDesc').focus(),80);
 }
@@ -868,7 +899,7 @@ async function saveTx() {
   const card=document.getElementById('fCardF').value;
   if(!desc||isNaN(amt)||amt<0||!date){toast('Fill in all required fields','bad');return;}
   const t={id:id||crypto.randomUUID(),description:desc,category:document.getElementById('fCatF').value,type:document.getElementById('fTypeF').value,amount:amt,date,card};
-  if(CC.has(card)){t.statementd=document.getElementById('fStmtd').checked;t.pending=document.getElementById('fPending').checked;}
+  if(CC.has(card)){const s=getStatusFromBtns();t.statementd=s.statementd;t.pending=s.pending;}
   const isNewSalary  = !id  && t.category === 'Salary';
   const isEditSalary = !!id && t.category === 'Salary';
   if(id){const i=txs.findIndex(x=>x.id===id);if(i>=0)txs[i]=t;else txs.unshift(t);}else txs.unshift(t);
@@ -895,9 +926,9 @@ async function deleteTx(id) {
 }
 async function cycleBadge(id) {
   const t=txs.find(x=>x.id===id); if(!t||!CC.has(t.card)) return;
-  if(!t.statementd&&!t.pending){t.statementd=true;t.pending=false;}
-  else if(t.statementd&&!t.pending){t.statementd=false;t.pending=true;}
-  else{t.statementd=false;t.pending=false;}
+  if(t.pending)         { t.pending=false; t.statementd=false; }  // Pending → Confirmed
+  else if(!t.statementd){ t.statementd=true; }                    // Confirmed → Statemeneted
+  else                  { t.pending=true; t.statementd=false; }   // Statemeneted → Pending
   render(); try{await save();}catch(_){}
 }
 
