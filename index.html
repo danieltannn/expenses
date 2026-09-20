@@ -39,13 +39,16 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 /* ── Wrap ── */
 .wrap{max-width:1280px;margin:0 auto;padding:20px 22px 80px}
 
-/* ── Stats ── */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:16px}
-.stat{background:var(--bg);padding:16px 20px}
-.stat-lbl{font-size:10px;font-weight:500;color:var(--w3);letter-spacing:.4px;margin-bottom:6px;text-transform:uppercase}
-.stat-val{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--w1);letter-spacing:-.5px}
-.stat-val.dim{color:var(--w2)}
-.stat-sub{font-size:11px;color:var(--w3);margin-top:4px}
+/* ── Monthly category spending bar ── */
+.cat-bar{border:1px solid var(--b1);background:var(--s1);margin-bottom:10px}
+.cat-bar-head{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--b1)}
+.cat-bar-month{font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.4px;text-transform:uppercase}
+.cat-bar-total{font-family:var(--mono);font-size:12px;color:var(--w2)}
+.cat-chips{display:flex;flex-wrap:wrap;gap:6px;padding:9px 14px}
+.cat-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid;font-size:12px;cursor:pointer;transition:opacity .15s}
+.cat-chip:hover{opacity:.7}
+.cat-chip-name{font-weight:500}
+.cat-chip-amt{font-family:var(--mono);font-size:11px}
 
 /* ── Filters ── */
 .filters{padding:8px 12px;background:var(--s1);border:1px solid var(--b1);margin-bottom:10px}
@@ -149,7 +152,20 @@ td{padding:11px 14px;vertical-align:middle;overflow:hidden;text-overflow:ellipsi
 .ss-lbl{font-size:10px;font-weight:500;color:var(--w3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px}
 .ss-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--w1);letter-spacing:-.4px}
 
-/* ── Chart panel ── */
+/* ── Chart drill-down ── */
+.drill-header{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s}
+.drill-header:hover{background:var(--s2)}
+.drill-back{font-size:16px;color:var(--w3)}
+.drill-title{font-size:13px;font-weight:600}
+.drill-count{font-size:12px;color:var(--w2);margin-left:auto;font-family:var(--mono)}
+.drill-row{display:grid;grid-template-columns:110px 1fr 110px 100px;gap:0 12px;padding:10px 20px;border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s;align-items:center}
+.drill-row:last-child{border-bottom:none}
+.drill-row:hover{background:var(--s2)}
+.drill-date{font-size:12px;color:var(--w3)}
+.drill-desc{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drill-card{font-size:12px;color:var(--w2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drill-amt{font-family:var(--mono);font-size:12px;font-weight:500;text-align:right;white-space:nowrap}
+.drill-amt.out{color:#f43f5e}.drill-amt.in{color:#4ade80}
 .chart-inner{display:flex;gap:0;align-items:stretch;flex-wrap:wrap}
 .chart-donut-col{padding:32px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid var(--b1);min-width:280px}
 .chart-legend-col{flex:1;min-width:280px;display:flex;flex-direction:column}
@@ -229,11 +245,6 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 /* ── Mobile ── */
 @media(max-width:700px){
   .wrap{padding:10px 10px 80px}
-  /* Stats: 3 columns but tiny */
-  .stat{padding:10px 12px}
-  .stat-val{font-size:16px}
-  .stat-lbl{font-size:9px}
-  .stat-sub{font-size:10px}
   .subs-summary{grid-template-columns:1fr 1fr}
   .subs-summary .ss-cell:last-child{grid-column:1/-1}
   /* Filters: wrap to 2 cols on mobile */
@@ -272,11 +283,11 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 
 <div class="wrap">
 
-  <!-- Stats (context-aware) -->
-  <div class="stats">
-    <div class="stat"><div class="stat-lbl" id="s1Lbl">Money Out</div><div class="stat-val"    id="sOut">—</div><div class="stat-sub" id="sOutN"></div></div>
-    <div class="stat"><div class="stat-lbl" id="s2Lbl">Money In</div> <div class="stat-val dim" id="sIn">—</div> <div class="stat-sub" id="sInN"></div></div>
-    <div class="stat"><div class="stat-lbl" id="s3Lbl">Net</div>       <div class="stat-val"    id="sNet">—</div><div class="stat-sub" id="sNetN"></div></div>
+  <!-- Monthly category spending bar -->
+  <div class="cat-bar" id="catBar">
+    <div class="cat-bar-head">
+      <span class="cat-bar-month">Loading…</span>
+    </div>
   </div>
 
   <!-- Filters (table-only) -->
@@ -460,7 +471,6 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 const CC      = new Set(['Citi Rewards','HSBC','Trust','UOB Ladys']);
 const CFG_K   = 'ldgr_cfg';
 const SHA_K   = 'ldgr_sha';
-const GRAYS   = ['#ffffff','#d8d8d8','#b0b0b0','#888888','#606060','#3c3c3c','#1e1e1e'];
 const CYCLE_MUL = { weekly:52/12, monthly:1, quarterly:1/3, 'half-yearly':1/6, yearly:1/12 };
 const CYCLE_LBL = { weekly:'Weekly', monthly:'Monthly', quarterly:'Quarterly', 'half-yearly':'Half-yearly', yearly:'Yearly' };
 
@@ -578,9 +588,9 @@ function setView(mode) {
   document.getElementById('btnChart').className = 'btn'+(mode==='chart' ?' btn-solid':'');
   document.getElementById('btnSubs').className  = 'btn'+(mode==='subs'  ?' btn-solid':'');
 
-  if (mode==='chart') renderChart();
+  if (mode==='chart') { chartDrillCat=null; renderChart(); }
   if (mode==='subs')  renderSubs();
-  renderStats();
+  renderCatSpending();
   renderMeta();
 }
 
@@ -623,7 +633,7 @@ function render() {
   });
   view.sort((a,b)=>sortK==='amount'?sortD*(a.amount-b.amount):sortD*String(a[sortK]).localeCompare(String(b[sortK])));
 
-  renderStats();
+  renderCatSpending();
   renderMeta();
   if(viewMode==='table') renderTable();
   else if(viewMode==='chart') renderChart();
@@ -632,43 +642,49 @@ function render() {
 function toggleSort(k) { if(sortK===k) sortD*=-1; else{sortK=k;sortD=-1;} render(); }
 function resetFilters() { ['fMonth','fCat','fCard','fType','fStatus'].forEach(id=>{document.getElementById(id).value='';}); render(); }
 
-// ═══ Stats ═════════════════════════════════════════════════════
-function renderStats() {
-  if (viewMode==='subs') {
-    const active=subs.filter(s=>s.active);
-    const monthly=active.reduce((sum,s)=>sum+monthlyEq(s.amount,s.cycle),0);
-    const yearly=monthly*12;
-    document.getElementById('s1Lbl').textContent='Monthly cost';
-    document.getElementById('s2Lbl').textContent='Yearly cost';
-    document.getElementById('s3Lbl').textContent='Active';
-    document.getElementById('sOut').textContent=fmt(monthly);
-    document.getElementById('sOutN').textContent=active.length+' subscriptions';
-    document.getElementById('sIn').textContent=fmt(yearly);
-    document.getElementById('sInN').textContent='estimated';
-    document.getElementById('sNet').textContent=String(subs.length);
-    document.getElementById('sNet').className='stat-val dim';
-    document.getElementById('sNetN').textContent='total tracked';
-  } else {
-    const src=viewMode==='table'?view:txs;
-    let out=0,oc=0,inc=0,ic=0;
-    src.forEach(t=>{if(t.type==='Expenses'||t.type==='Investments'){out+=t.amount;oc++;}else{inc+=t.amount;ic++;}});
-    const net=inc-out;
-    document.getElementById('s1Lbl').textContent='Money Out';
-    document.getElementById('s2Lbl').textContent='Money In';
-    document.getElementById('s3Lbl').textContent='Net';
-    document.getElementById('sOut').textContent=fmt(out);
-    document.getElementById('sOut').style.color='#f43f5e';
-    document.getElementById('sOutN').textContent=oc+' transaction'+(oc!==1?'s':'');
-    document.getElementById('sIn').textContent=fmt(inc);
-    document.getElementById('sIn').style.color='#4ade80';
-    document.getElementById('sInN').textContent=ic+' transaction'+(ic!==1?'s':'');
-    const ne=document.getElementById('sNet');
-    ne.textContent=(net>=0?'+':'−')+fmt(Math.abs(net));
-    ne.style.color = net>=0 ? '#4ade80' : '#f43f5e';
-    ne.className='stat-val';
-    document.getElementById('sNetN').textContent=src.length+' transactions';
+// ═══ Monthly category spending bar ════════════════════════════
+const CAT_COLOR = {
+  Food:'#f59e0b', Transport:'#38bdf8', Lifestyle:'#a78bfa',
+  Necessity:'#34d399', Subscription:'#fb7185', Travel:'#2dd4bf',
+  Investments:'#fbbf24', Salary:'#4ade80', Interest:'#818cf8',
+};
+
+function renderCatSpending() {
+  const el = document.getElementById('catBar');
+  if (!txs.length) { el.style.display='none'; return; }
+  el.style.display='';
+  // Current month or most recent month in data
+  const now = new Date();
+  const todayMo = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const months = [...new Set(txs.map(t=>t.date.slice(0,7)))].sort().reverse();
+  const monthKey = months.includes(todayMo) ? todayMo : (months[0]||todayMo);
+  const monthTxs = txs.filter(t=>t.date.startsWith(monthKey)&&(t.type==='Expenses'||t.type==='Investments'));
+  const [y,mo] = monthKey.split('-');
+  const monthLabel = new Date(+y,+mo-1,1).toLocaleString('en-SG',{month:'long',year:'numeric'});
+  if (!monthTxs.length) {
+    el.innerHTML=`<div class="cat-bar-head"><span class="cat-bar-month">${monthLabel} — no spending recorded</span></div>`;
+    return;
   }
+  const byCategory={};
+  monthTxs.forEach(t=>{byCategory[t.category]=(byCategory[t.category]||0)+t.amount;});
+  const sorted=Object.entries(byCategory).sort((a,b)=>b[1]-a[1]);
+  const total=sorted.reduce((s,[,v])=>s+v,0);
+  const chips=sorted.map(([cat,amount])=>{
+    const c=CAT_COLOR[cat]||'#aaa';
+    return `<div class="cat-chip" style="color:${c};border-color:${c}40;background:${c}18"
+      onclick="setView('chart');setTimeout(()=>drillCategory('${esc(cat)}'),60)" title="Click to see ${esc(cat)} transactions">
+      <span class="cat-chip-name">${esc(cat)}</span>
+      <span class="cat-chip-amt">${fmt(amount)}</span>
+    </div>`;
+  }).join('');
+  el.innerHTML=`
+    <div class="cat-bar-head">
+      <span class="cat-bar-month">${monthLabel}</span>
+      <span class="cat-bar-total">${fmt(total)} out</span>
+    </div>
+    <div class="cat-chips">${chips}</div>`;
 }
+
 function renderMeta() {
   const txt = viewMode==='table'
     ? (view.length===txs.length?txs.length+' transactions':view.length+' of '+txs.length+' transactions')
@@ -830,68 +846,94 @@ function subSort(k) {
 }
 
 // ═══ Chart ═════════════════════════════════════════════════════
-function getPayPeriods() {
-  // Match by category so it works regardless of which Type the user set
-  const salaries=txs.filter(t=>t.category==='Salary').sort((a,b)=>a.date.localeCompare(b.date));
-  const expenses=txs.filter(t=>t.type==='Expenses'||t.type==='Investments');
-  const periods=[];
-  if(!salaries.length){const total=expenses.reduce((s,t)=>s+t.amount,0);return[{label:'All expenses',shortLabel:'All',amount:total,count:expenses.length}];}
-  const pre=expenses.filter(t=>t.date<salaries[0].date);
-  if(pre.length){const total=pre.reduce((s,t)=>s+t.amount,0);const earliest=pre.reduce((a,b)=>a.date<b.date?a:b).date;periods.push({label:`Before pay  (${fmtSho(earliest)} – ${fmtSho(salaries[0].date)})`,shortLabel:'Before pay',amount:total,count:pre.length});}
-  salaries.forEach((sal,i)=>{
-    const start=sal.date;const end=i+1<salaries.length?salaries[i+1].date:null;
-    const chunk=expenses.filter(t=>t.date>=start&&(end===null||t.date<end));
-    const total=chunk.reduce((s,t)=>s+t.amount,0);
-    const endLbl=end?fmtSho(end):'now';
-    periods.push({label:`Pay ${i+1}  (${fmtSho(start)} – ${endLbl})`,shortLabel:`Pay ${i+1}`,amount:total,count:chunk.length});
-  });
-  return periods;
-}
+// ═══ Category spending chart ════════════════════════════════════
+let chartDrillCat = null; // null = overview, string = drilled category
 
-function buildDonut(periods,total) {
+function drillCategory(cat) { chartDrillCat=cat; renderChart(); }
+
+function buildCategoryDonut(segments, total) {
   const cx=130,cy=130,R=115,r=65;
   let angle=-Math.PI/2,paths='';
-  periods.forEach((p,i)=>{
+  segments.forEach(p=>{
     if(p.amount<=0) return;
+    const color=CAT_COLOR[p.cat]||'#888';
     const sweep=(p.amount/total)*Math.PI*2,end=angle+sweep,large=sweep>Math.PI?1:0;
     const x1=cx+R*Math.cos(angle),y1=cy+R*Math.sin(angle);
     const x2=cx+R*Math.cos(end),  y2=cy+R*Math.sin(end);
     const xi1=cx+r*Math.cos(angle),yi1=cy+r*Math.sin(angle);
     const xi2=cx+r*Math.cos(end),  yi2=cy+r*Math.sin(end);
     const d=`M${x1.toFixed(2)},${y1.toFixed(2)} A${R},${R} 0 ${large},1 ${x2.toFixed(2)},${y2.toFixed(2)} L${xi2.toFixed(2)},${yi2.toFixed(2)} A${r},${r} 0 ${large},0 ${xi1.toFixed(2)},${yi1.toFixed(2)} Z`;
-    paths+=`<path d="${d}" fill="${GRAYS[i%GRAYS.length]}" stroke="#000" stroke-width="3"/>`;
+    paths+=`<path d="${d}" fill="${color}" stroke="#000" stroke-width="2" style="cursor:pointer" onclick="drillCategory('${esc(p.cat)}')" title="${esc(p.cat)}: ${fmt(p.amount)}"/>`;
     angle=end;
   });
   const ca=fmt(total).replace('SGD ','');
-  return `<svg viewBox="0 0 260 260" width="220" height="220" style="display:block">${paths}<circle cx="${cx}" cy="${cy}" r="${r-4}" fill="#000"/><text x="${cx}" y="${cy-10}" text-anchor="middle" font-size="10" font-family="Inter,system-ui" fill="#666" letter-spacing="1">TOTAL OUT</text><text x="${cx}" y="${cy+10}" text-anchor="middle" font-size="15" font-weight="700" font-family="Inter,system-ui" fill="#fff">${ca}</text><text x="${cx}" y="${cy+26}" text-anchor="middle" font-size="10" font-family="Inter,system-ui" fill="#666">SGD</text></svg>`;
+  return `<svg viewBox="0 0 260 260" width="220" height="220" style="display:block">${paths}
+    <circle cx="${cx}" cy="${cy}" r="${r-4}" fill="#000"/>
+    <text x="${cx}" y="${cy-10}" text-anchor="middle" font-size="10" font-family="Inter,system-ui" fill="#666" letter-spacing="1">TOTAL OUT</text>
+    <text x="${cx}" y="${cy+10}" text-anchor="middle" font-size="15" font-weight="700" font-family="Inter,system-ui" fill="#fff">${ca}</text>
+    <text x="${cx}" y="${cy+26}" text-anchor="middle" font-size="10" font-family="Inter,system-ui" fill="#666">SGD</text>
+  </svg>`;
 }
 
 function renderChart() {
   const el=document.getElementById('chartWrap');
   if(!txs.length){el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No data loaded yet.</p></div>`;return;}
-  const periods=getPayPeriods();
-  const total=periods.reduce((s,p)=>s+p.amount,0);
-  if(total===0){el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No expense transactions found.</p></div>`;return;}
-  const legendRows=periods.map((p,i)=>`
-    <div class="chart-legend-row">
-      <div class="leg-swatch" style="background:${GRAYS[i%GRAYS.length]}"></div>
-      <div class="leg-label">${esc(p.label)}<br><span style="font-size:10px;color:var(--w3)">${p.count} transactions</span></div>
+  if(chartDrillCat){renderCategoryDrill(el,chartDrillCat);return;}
+
+  const expenses=view.filter(t=>t.type==='Expenses'||t.type==='Investments');
+  if(!expenses.length){el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No expenses in current filter.</p></div>`;return;}
+
+  const byCategory={};
+  expenses.forEach(t=>{byCategory[t.category]=(byCategory[t.category]||0)+t.amount;});
+  const segments=Object.entries(byCategory).map(([cat,amount])=>({cat,amount})).sort((a,b)=>b.amount-a.amount);
+  const total=segments.reduce((s,p)=>s+p.amount,0);
+
+  const legendRows=segments.map(p=>{
+    const c=CAT_COLOR[p.cat]||'#aaa';
+    return `<div class="chart-legend-row" onclick="drillCategory('${esc(p.cat)}')" style="cursor:pointer" title="Click to drill in">
+      <div class="leg-swatch" style="background:${c}"></div>
+      <div class="leg-label">${esc(p.cat)}</div>
       <div class="leg-pct">${((p.amount/total)*100).toFixed(1)}%</div>
       <div class="leg-amt">${fmt(p.amount)}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+
   el.innerHTML=`<div class="chart-inner">
     <div class="chart-donut-col">
-      ${buildDonut(periods,total)}
-      <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;width:100%;max-width:220px">
-        ${periods.map((p,i)=>`<div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;background:${GRAYS[i%GRAYS.length]};flex-shrink:0"></div><span style="font-size:11px;color:var(--w2)">${esc(p.shortLabel)}</span><span style="font-size:11px;color:var(--w3);margin-left:auto">${((p.amount/total)*100).toFixed(1)}%</span></div>`).join('')}
+      ${buildCategoryDonut(segments,total)}
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:7px;width:100%;max-width:220px">
+        ${segments.map(p=>{const c=CAT_COLOR[p.cat]||'#aaa';return `<div style="display:flex;align-items:center;gap:7px;cursor:pointer" onclick="drillCategory('${esc(p.cat)}')"><div style="width:8px;height:8px;background:${c};border-radius:50%;flex-shrink:0"></div><span style="font-size:11px;color:var(--w2)">${esc(p.cat)}</span><span style="font-size:11px;color:var(--w3);margin-left:auto">${((p.amount/total)*100).toFixed(1)}%</span></div>`;}).join('')}
       </div>
     </div>
     <div class="chart-legend-col">
-      <div class="chart-legend-head">Spending breakdown by pay period</div>
+      <div class="chart-legend-head">Spending by category — click any row or slice to drill in</div>
       ${legendRows}
       <div class="chart-total-row"><div></div><div class="leg-label">Total</div><div class="leg-pct">100%</div><div class="leg-amt">${fmt(total)}</div></div>
     </div>
   </div>`;
+}
+
+function renderCategoryDrill(el,cat) {
+  const color=CAT_COLOR[cat]||'#aaa';
+  const catTxs=view.filter(t=>t.category===cat).sort((a,b)=>b.date.localeCompare(a.date));
+  const totalOut=catTxs.filter(t=>t.type==='Expenses'||t.type==='Investments').reduce((s,t)=>s+t.amount,0);
+  const rows=catTxs.map(t=>{
+    const isOut=t.type==='Expenses'||t.type==='Investments';
+    return `<div class="drill-row" onclick="openEdit('${esc(t.id)}')">
+      <span class="drill-date">${fmtDay(t.date)}</span>
+      <span class="drill-desc">${esc(t.description)}</span>
+      <span class="drill-card">${esc(t.card)}</span>
+      <span class="drill-amt ${isOut?'out':'in'}">${isOut?'−':'+'} ${fmt(t.amount)}</span>
+    </div>`;
+  }).join('');
+  el.innerHTML=`
+    <div class="drill-header" onclick="chartDrillCat=null;renderChart()">
+      <span class="drill-back">←</span>
+      <span class="pill ${CAT_CLASS[cat]||''}">${esc(cat)}</span>
+      <span class="drill-title">${catTxs.length} transaction${catTxs.length!==1?'s':''}</span>
+      <span class="drill-count">${fmt(totalOut)}</span>
+    </div>
+    ${rows||`<div class="empty"><div class="empty-ico">—</div><p>No transactions.</p></div>`}`;
 }
 
 // ═══ Modals ════════════════════════════════════════════════════
@@ -995,10 +1037,8 @@ async function saveTx() {
   txs.sort((a,b)=>b.date.localeCompare(a.date));
   closeModal('mAdd'); rebuildMonthFilter(); render();
   if (isNewSalary || isEditSalary) {
-    toast(isNewSalary ? 'New pay period created' : 'Pay period updated');
-    // Switch to chart so the updated periods are immediately visible
+    toast(isNewSalary ? 'Salary added' : 'Salary updated');
     if (viewMode !== 'chart') setTimeout(() => setView('chart'), 80);
-    else renderChart(); // already on chart — force re-render just in case
   }
   try{await save();}catch(_){}
 }
@@ -1070,12 +1110,12 @@ async function saveSub() {
 }
 async function deleteSub(id) {
   if(!confirm('Delete this subscription?')) return;
-  subs=subs.filter(s=>s.id!==id); renderSubs(); renderStats(); renderMeta();
+  subs=subs.filter(s=>s.id!==id); renderSubs(); renderCatSpending(); renderMeta();
   try{await save();}catch(_){}
 }
 async function toggleSubActive(id) {
   const s=subs.find(x=>x.id===id); if(!s) return;
-  s.active=!s.active; renderSubs(); renderStats();
+  s.active=!s.active; renderSubs(); renderCatSpending();
   try{await save();}catch(_){}
 }
 
