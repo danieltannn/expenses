@@ -1,28 +1,6 @@
 {
   "transactions": [
     {
-      "id": "76cd7a26-b8aa-45c6-b9dd-1666880346e8",
-      "description": "Grab",
-      "category": "nan",
-      "type": "nan",
-      "amount": 14.3,
-      "date": "nan",
-      "card": "Citi Rewards",
-      "statementd": false,
-      "pending": false
-    },
-    {
-      "id": "e0ac26e7-7eb7-4306-9828-b0ec9db215e0",
-      "description": "Grab",
-      "category": "nan",
-      "type": "nan",
-      "amount": 25.9,
-      "date": "nan",
-      "card": "Citi Rewards",
-      "statementd": false,
-      "pending": false
-    },
-    {
       "id": "28bcb9bc-9615-434a-acde-40c980cbfae8",
       "description": "Ryde",
       "category": "Transport",
