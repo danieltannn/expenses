@@ -145,7 +145,7 @@
       "amount": 19.99,
       "date": "2026-08-18",
       "card": "Citi Rewards",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
