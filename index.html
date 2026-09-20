@@ -843,14 +843,28 @@ async function saveTx() {
   if(!desc||isNaN(amt)||amt<0||!date){toast('Fill in all required fields','bad');return;}
   const t={id:id||crypto.randomUUID(),description:desc,category:document.getElementById('fCatF').value,type:document.getElementById('fTypeF').value,amount:amt,date,card};
   if(CC.has(card)){t.statementd=document.getElementById('fStmtd').checked;t.pending=document.getElementById('fPending').checked;}
+  const isNewSalary = !id && t.type === 'Salary';
+  const isEditSalary = !!id && t.type === 'Salary';
   if(id){const i=txs.findIndex(x=>x.id===id);if(i>=0)txs[i]=t;else txs.unshift(t);}else txs.unshift(t);
   txs.sort((a,b)=>b.date.localeCompare(a.date));
   closeModal('mAdd'); rebuildMonthFilter(); render();
+  if (isNewSalary || isEditSalary) {
+    toast(isNewSalary ? 'New pay period created' : 'Pay period updated');
+    // Switch to chart so the updated periods are immediately visible
+    if (viewMode !== 'chart') setTimeout(() => setView('chart'), 80);
+    else renderChart(); // already on chart — force re-render just in case
+  }
   try{await save();}catch(_){}
 }
 async function deleteTx(id) {
   if(!confirm('Delete this transaction?')) return;
+  const wasSalary = txs.find(t=>t.id===id)?.type === 'Salary';
   txs=txs.filter(t=>t.id!==id); rebuildMonthFilter(); render();
+  if (wasSalary) {
+    toast('Pay period removed');
+    if (viewMode !== 'chart') setTimeout(() => setView('chart'), 80);
+    else renderChart();
+  }
   try{await save();}catch(_){}
 }
 async function cycleBadge(id) {
