@@ -325,7 +325,7 @@
       "id": "979fc46c-686d-4084-8f92-6177327b8a9d",
       "description": "Salary",
       "category": "Salary",
-      "type": "Gain",
+      "type": "Salary",
       "amount": 6705.19,
       "date": "2026-08-06",
       "card": "DBS Debit"
