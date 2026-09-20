@@ -1,17 +1,6 @@
 {
   "transactions": [
     {
-      "id": "93cd935c-655f-4a16-ac16-a4590794ebe0",
-      "description": "Grab",
-      "category": "nan",
-      "type": "nan",
-      "amount": 19.2,
-      "date": "nan",
-      "card": "Citi Rewards",
-      "statementd": false,
-      "pending": false
-    },
-    {
       "id": "76cd7a26-b8aa-45c6-b9dd-1666880346e8",
       "description": "Grab",
       "category": "nan",
