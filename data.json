@@ -1098,7 +1098,7 @@
       "amount": 1798.51,
       "date": "2026-08-12",
       "card": "Trust",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
