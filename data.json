@@ -10,6 +10,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "0d699436-a71d-4942-92f6-81fda1574f22",
+      "description": "Food",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 59.02,
+      "date": "2026-09-19",
+      "card": "Trust",
+      "statementd": false,
+      "pending": true
+    },
+    {
       "id": "dbf96a16-8759-44e0-a892-cfec894815d8",
       "description": "Game Conversion",
       "category": "Lifestyle",
