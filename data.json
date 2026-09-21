@@ -809,6 +809,17 @@
       "pending": false
     },
     {
+      "id": "4c2deee3-6a3e-461a-b163-47665cbb12c2",
+      "description": "Haircut",
+      "category": "Necessity",
+      "type": "Expenses",
+      "amount": 65.4,
+      "date": "2026-08-23",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "c188736a-041e-4cd3-a150-ac1504e2f89b",
       "description": "Food",
       "category": "Food",
