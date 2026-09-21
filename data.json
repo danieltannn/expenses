@@ -82,6 +82,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "17f2a7f1-0eaa-453d-808e-508758cddb18",
+      "description": "Gojek",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 24.1,
+      "date": "2026-09-11",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "34b955f6-9778-4802-9ae3-ddc2fbe463bf",
       "description": "Claude Conversion Fee",
       "category": "Transport",
