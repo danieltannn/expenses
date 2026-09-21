@@ -136,6 +136,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "514b14c0-0ca4-443f-a510-0d8d8f824046",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 19.7,
+      "date": "2026-09-07",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "0f72ca20-00f2-43f9-ae39-de571b7dfb4c",
       "description": "Government Give Money",
       "category": "Lifestyle",
