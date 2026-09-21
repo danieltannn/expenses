@@ -75,6 +75,12 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 
 /* ── View bar ── */
 .view-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+/* ── Totals bar ── */
+.totals-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:10px}
+.tc{background:var(--bg);padding:10px 16px}
+.tc-lbl{font-size:10px;font-weight:500;color:var(--w3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.tc-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+.tc-sub{font-size:10px;color:var(--w3);margin-top:3px}
 .meta{font-size:11px;color:var(--w3)}
 .tabs{display:flex;gap:0}
 .tabs .btn{border-radius:0;margin-left:-1px;padding:5px 14px;font-size:11px}
@@ -384,6 +390,9 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
     </div>
   </div>
 
+  <!-- Totals bar — shows filtered view totals -->
+  <div class="totals-bar" id="totalsBar" style="display:none"></div>
+
   <!-- View bar -->
   <div class="view-bar">
     <span class="meta" id="metaCount"></span>
@@ -654,6 +663,7 @@ function setView(mode) {
   if (mode==='chart') { chartDrillCat=null; renderChart(); }
   if (mode==='subs')  renderSubs();
   renderCatSpending();
+  renderTotals();
   renderMeta();
 }
 
@@ -731,6 +741,7 @@ function render() {
   view.sort((a,b) => sortK==='amount' ? sortD*(a.amount-b.amount) : sortD*String(a[sortK]).localeCompare(String(b[sortK])));
 
   renderCatSpending();
+  renderTotals();
   renderMeta();
   if (viewMode==='table') renderTable();
   else if (viewMode==='chart') renderChart();
@@ -781,6 +792,39 @@ function renderCatSpending() {
       <span class="cat-bar-total">${fmt(total)} out</span>
     </div>
     <div class="cat-chips">${chips}</div>`;
+}
+
+// ═══ Totals bar (filtered view) ════════════════════════════════
+function renderTotals() {
+  const el = document.getElementById('totalsBar');
+  if (!el) return;
+  // Only show on the Transactions tab
+  if (viewMode !== 'table') { el.style.display='none'; return; }
+  el.style.display='';
+
+  let out=0,oc=0,inc=0,ic=0;
+  view.forEach(t=>{
+    if(t.type==='Expenses'||t.type==='Investments'){out+=t.amount;oc++;}
+    else{inc+=t.amount;ic++;}
+  });
+  const net=inc-out;
+
+  el.innerHTML=`
+    <div class="tc">
+      <div class="tc-lbl">Money Out</div>
+      <div class="tc-val" style="color:#f43f5e">− ${fmt(out)}</div>
+      <div class="tc-sub">${oc} transaction${oc!==1?'s':''}</div>
+    </div>
+    <div class="tc">
+      <div class="tc-lbl">Money In</div>
+      <div class="tc-val" style="color:#4ade80">+ ${fmt(inc)}</div>
+      <div class="tc-sub">${ic} transaction${ic!==1?'s':''}</div>
+    </div>
+    <div class="tc">
+      <div class="tc-lbl">Net</div>
+      <div class="tc-val" style="color:${net>=0?'#4ade80':'#f43f5e'}">${net>=0?'+':'−'} ${fmt(Math.abs(net))}</div>
+      <div class="tc-sub">${view.length} of ${txs.length} shown</div>
+    </div>`;
 }
 
 function renderMeta() {
