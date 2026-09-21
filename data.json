@@ -208,6 +208,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "16703fa5-c34a-417a-bee8-acb6f83bf73d",
+      "description": "TorBox",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 3.95,
+      "date": "2026-08-29",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "e7146f6b-c5d0-4d95-b03e-c7e86a2f90c9",
       "description": "grab",
       "category": "Transport",
