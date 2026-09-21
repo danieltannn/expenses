@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "f9afd123-a386-4fd6-92d2-e915954656e3",
+      "description": "Food",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 5.5,
+      "date": "2026-09-10",
+      "card": "DBS Debit"
+    },
+    {
       "id": "e2a0ec46-c48b-4bc5-8447-70ba469e29c5",
       "description": "Transport Fee",
       "category": "Transport",
