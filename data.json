@@ -19,6 +19,15 @@
       "card": "DBS Debit"
     },
     {
+      "id": "a1a7f687-7dee-48ce-adb7-3e2d6333635f",
+      "description": "Game",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 1.29,
+      "date": "2026-09-15",
+      "card": "DBS Debit"
+    },
+    {
       "id": "a5ac67a6-c3df-4bdb-abf9-01dc05aac6c9",
       "description": "Game",
       "category": "Lifestyle",
