@@ -19,6 +19,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "ae91ff55-0635-486a-974a-2a6a49b2f9eb",
+      "description": "Game",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 14.98,
+      "date": "2026-09-17",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "05f53ad4-5402-4323-b045-72f2a8c39910",
       "description": "Game",
       "category": "Lifestyle",
