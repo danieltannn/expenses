@@ -550,6 +550,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "d4e0e718-9241-4ed4-afe3-a2009f012a4e",
+      "description": "Cross Border",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 2.82,
+      "date": "2026-09-06",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "cad4cf78-b93b-4f32-bafa-372a5bae7e19",
       "description": "Taobao",
       "category": "Lifestyle",
