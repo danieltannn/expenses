@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "91da3c20-0b5b-495c-87d2-7dcadb0674a7",
+      "description": "Shanghai Plane Ticket",
+      "category": "Travel",
+      "type": "Expenses",
+      "amount": 1183.5,
+      "date": "2026-09-21",
+      "card": "DBS Debit"
+    },
+    {
       "id": "5f6caadf-fb6f-4c7a-9548-4408ac8bbeb7",
       "description": "Food",
       "category": "Food",
