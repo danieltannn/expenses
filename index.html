@@ -130,6 +130,7 @@ td{padding:11px 14px;vertical-align:middle;overflow:hidden;text-overflow:ellipsi
 .p-investments {background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.25)}
 .p-salary      {background:rgba(74,222,128,.12);color:#4ade80;border-color:rgba(74,222,128,.25)}
 .p-interest    {background:rgba(129,140,248,.12);color:#818cf8;border-color:rgba(129,140,248,.25)}
+.p-installment {background:rgba(249,115,22,.12); color:#f97316;border-color:rgba(249,115,22,.25)}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;font-size:11px;font-weight:500;white-space:nowrap;cursor:pointer;transition:opacity .15s}
 .badge:hover{opacity:.7}
 .b-pending{background:var(--w1);color:var(--bg)}
@@ -268,8 +269,41 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 .txc-del:hover{color:var(--w1)}
 .mo-sep{padding:5px 14px;font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--b1);background:var(--s1)}
 
-/* ── Mobile ── */
-@media(max-width:700px){
+/* ── Credit Cards view ── */
+.cc-wrap{display:flex;flex-direction:column;gap:12px}
+.cc-section{border:1px solid var(--b1);background:var(--bg)}
+.cc-head{background:var(--s1);border-bottom:1px solid var(--b1);padding:12px 18px;display:flex;align-items:center;gap:10px}
+.cc-head-name{font-size:14px;font-weight:600}
+.cc-head-pts{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px}
+.cc-pts-lbl{color:var(--w3)}
+.cc-pts-val{font-family:var(--mono);font-weight:600;color:var(--w1);min-width:50px;text-align:right}
+.cc-pts-input{width:80px;padding:3px 6px;font-size:12px;text-align:right;background:var(--bg);border:1px solid var(--w1);color:var(--w1);outline:none;font-family:var(--mono)}
+/* Outstanding */
+.cc-outstanding{padding:12px 18px;border-bottom:1px solid var(--b1)}
+.cc-out-lbl{font-size:10px;font-weight:600;color:var(--w3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.cc-out-grid{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end}
+.cc-out-cell{}
+.cc-out-cell-lbl{font-size:11px;color:var(--w3);margin-bottom:3px}
+.cc-out-cell-val{font-family:var(--mono);font-size:14px;font-weight:600}
+.cc-out-cell-sub{font-size:10px;color:var(--w3);margin-top:1px}
+.cc-out-total{margin-left:auto}
+.cc-out-total-lbl{font-size:10px;color:var(--w3);text-align:right;margin-bottom:3px}
+.cc-out-total-val{font-family:var(--mono);font-size:18px;font-weight:700;color:#f43f5e}
+/* Statements */
+.cc-stmts-head{padding:7px 18px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
+.cc-stmts-lbl{font-size:10px;font-weight:600;color:var(--w3);text-transform:uppercase;letter-spacing:.4px}
+.cc-stmt{display:grid;grid-template-columns:120px 130px 150px 1fr auto;gap:0 14px;padding:11px 18px;border-bottom:1px solid var(--b1);align-items:center;transition:background .1s}
+.cc-stmt:last-child{border-bottom:none}
+.cc-stmt:hover{background:var(--s2)}
+.cc-stmt-date{font-size:12px;color:var(--w2)}
+.cc-stmt-amt{font-family:var(--mono);font-size:13px;font-weight:600;color:#f43f5e}
+.cc-stmt-due{font-size:12px}
+.cc-stmt-due.overdue{color:#f43f5e;font-weight:600}
+.cc-stmt-due.soon{color:#f59e0b;font-weight:600}
+.cc-stmt-due.ok{color:var(--w3)}
+.cc-stmt-paid{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;transition:opacity .15s;user-select:none}
+.cc-stmt-paid:hover{opacity:.7}
+.cc-no-stmt{padding:14px 18px;font-size:12px;color:var(--w3)}
   .wrap{padding:10px 10px 80px}
   .subs-summary{grid-template-columns:1fr 1fr}
   .subs-summary .ss-cell:last-child{grid-column:1/-1}
@@ -338,6 +372,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
             <label class="mf-opt"><input type="checkbox" value="Investments"  onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#fbbf24"></div>Investments</label>
             <label class="mf-opt"><input type="checkbox" value="Salary"       onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#4ade80"></div>Salary</label>
             <label class="mf-opt"><input type="checkbox" value="Interest"     onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#818cf8"></div>Interest</label>
+            <label class="mf-opt"><input type="checkbox" value="Installment"  onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#f97316"></div>Installment</label>
           </div>
           <div class="mf-foot"><button class="mf-clr" onclick="mfClear('cats')">Clear</button></div>
         </div>
@@ -367,6 +402,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
             <label class="mf-opt"><input type="checkbox" value="Gain"        onchange="mfChange('types',this.value,this.checked)">Gain</label>
             <label class="mf-opt"><input type="checkbox" value="Investments" onchange="mfChange('types',this.value,this.checked)">Investments</label>
             <label class="mf-opt"><input type="checkbox" value="Salary"      onchange="mfChange('types',this.value,this.checked)">Salary</label>
+            <label class="mf-opt"><input type="checkbox" value="Installment" onchange="mfChange('types',this.value,this.checked)">Installment</label>
           </div>
           <div class="mf-foot"><button class="mf-clr" onclick="mfClear('types')">Clear</button></div>
         </div>
@@ -400,6 +436,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
       <button class="btn btn-solid" id="btnTable" onclick="setView('table')">Transactions</button>
       <button class="btn"           id="btnChart" onclick="setView('chart')">Pay Period Chart</button>
       <button class="btn"           id="btnSubs"  onclick="setView('subs')">Subscriptions</button>
+      <button class="btn"           id="btnCC"    onclick="setView('cc')">Credit Cards</button>
     </div>
   </div>
 
@@ -415,6 +452,11 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   <div id="subsView" style="display:none">
     <div class="subs-summary" id="subsSummary"></div>
     <div class="panel" id="subsWrap"></div>
+  </div>
+
+  <!-- Credit Cards view -->
+  <div id="ccView" style="display:none">
+    <div class="cc-wrap" id="ccWrap"></div>
   </div>
 
 </div>
@@ -442,11 +484,12 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
             <option>Food</option><option>Transport</option><option>Lifestyle</option>
             <option>Necessity</option><option>Subscription</option><option>Travel</option>
             <option>Investments</option><option>Salary</option><option>Interest</option>
+            <option>Installment</option>
           </select>
         </div>
         <div class="fg"><label>Type</label>
           <select id="fTypeF">
-            <option>Expenses</option><option>Gain</option><option>Investments</option><option>Salary</option>
+            <option>Expenses</option><option>Gain</option><option>Investments</option><option>Salary</option><option>Installment</option>
           </select>
         </div>
       </div>
@@ -518,7 +561,32 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   </div>
 </div>
 
-<!-- ── Settings modal ── -->
+<!-- ── Statement modal ── -->
+<div class="overlay off" id="mStmt">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="mStmtTitle">Add Statement</div>
+      <button class="modal-close" onclick="closeModal('mStmt')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label>Statement Amount (SGD)</label><input type="number" id="sfStmtAmt" placeholder="0.00" step="0.01" min="0"></div>
+      <div class="fr">
+        <div class="fg"><label>Statement Date</label><input type="date" id="sfStmtDate"></div>
+        <div class="fg"><label>Payment Due Date</label><input type="date" id="sfStmtDue"></div>
+      </div>
+      <div class="cc-block" style="border-left-color:var(--w2)">
+        <div class="tog-row">
+          <span style="font-size:13px">Paid</span>
+          <label class="tog"><input type="checkbox" id="sfStmtPaid"><span class="tog-sl"></span></label>
+        </div>
+      </div>
+      <div class="form-acts">
+        <button class="btn" onclick="closeModal('mStmt')">Cancel</button>
+        <button class="btn btn-solid" onclick="saveStatement()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="overlay off" id="mSettings">
   <div class="modal">
     <div class="modal-head">
@@ -541,7 +609,8 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 
 <script>
 // ═══ Constants ════════════════════════════════════════════════
-const CC      = new Set(['Citi Rewards','HSBC','Trust','UOB Ladys']);
+const CC       = new Set(['Citi Rewards','HSBC','Trust','UOB Ladys']);
+const OUT_TYPES = new Set(['Expenses','Investments','Installment']);
 const CFG_K   = 'ldgr_cfg';
 const SHA_K   = 'ldgr_sha';
 const CYCLE_MUL = { weekly:52/12, monthly:1, quarterly:1/3, 'half-yearly':1/6, yearly:1/12 };
@@ -550,6 +619,9 @@ const CYCLE_LBL = { weekly:'Weekly', monthly:'Monthly', quarterly:'Quarterly', '
 // ═══ State ═══════════════════════════════════════════════════
 let txs      = [];
 let subs     = [];
+let cards    = {};   // { cardName: { points, statements:[{id,amount,statementDate,dueDate,paid}] } }
+let stmtEditCard = null;
+let stmtEditId   = null;
 let view     = [];
 let sortK    = 'date';
 let sortD    = -1;
@@ -634,8 +706,9 @@ async function load() {
   document.getElementById('tblWrap').innerHTML='<div class="loading"><div class="spin"></div><span>Loading…</span></div>';
   try {
     const data=await ghGet();
-    txs  = (data.transactions  ||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
-    subs = (data.subscriptions ||[]).slice();
+    txs   = (data.transactions  ||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+    subs  = (data.subscriptions ||[]).slice();
+    cards = data.cards || {};
     render();
   } catch(e) {
     setStatus('err','Error');
@@ -644,7 +717,7 @@ async function load() {
 }
 
 async function save() {
-  try { await ghPut({transactions:txs,subscriptions:subs}); toast('Saved'); }
+  try { await ghPut({transactions:txs, subscriptions:subs, cards}); toast('Saved'); }
   catch(e) { setStatus('err','Failed'); toast(e.message,'bad'); throw e; }
 }
 function manualSync() { load().then(()=>toast('Synced')).catch(e=>toast(e.message,'bad')); }
@@ -655,13 +728,18 @@ function setView(mode) {
   document.getElementById('tblWrap').style.display     = mode==='table' ? ''     : 'none';
   document.getElementById('chartWrap').style.display   = mode==='chart' ? ''     : 'none';
   document.getElementById('subsView').style.display    = mode==='subs'  ? ''     : 'none';
+  document.getElementById('ccView').style.display      = mode==='cc'    ? ''     : 'none';
   document.getElementById('filtersBar').style.display  = mode==='table' ? ''     : 'none';
   document.getElementById('btnTable').className = 'btn'+(mode==='table' ?' btn-solid':'');
   document.getElementById('btnChart').className = 'btn'+(mode==='chart' ?' btn-solid':'');
   document.getElementById('btnSubs').className  = 'btn'+(mode==='subs'  ?' btn-solid':'');
+  document.getElementById('btnCC').className    = 'btn'+(mode==='cc'    ?' btn-solid':'');
+  // FAB: hide on CC view (has its own add-statement buttons)
+  document.getElementById('fabBtn').style.display = mode==='cc' ? 'none' : '';
 
   if (mode==='chart') { chartDrillCat=null; renderChart(); }
   if (mode==='subs')  renderSubs();
+  if (mode==='cc')    renderCC();
   renderCatSpending();
   renderTotals();
   renderMeta();
@@ -759,6 +837,7 @@ const CAT_COLOR = {
   Food:'#f59e0b', Transport:'#38bdf8', Lifestyle:'#a78bfa',
   Necessity:'#34d399', Subscription:'#fb7185', Travel:'#2dd4bf',
   Investments:'#fbbf24', Salary:'#4ade80', Interest:'#818cf8',
+  Installment:'#f97316',
 };
 
 function renderCatSpending() {
@@ -804,7 +883,7 @@ function renderTotals() {
 
   let out=0,oc=0,inc=0,ic=0;
   view.forEach(t=>{
-    if(t.type==='Expenses'||t.type==='Investments'){out+=t.amount;oc++;}
+    if(OUT_TYPES.has(t.type)){out+=t.amount;oc++;}
     else{inc+=t.amount;ic++;}
   });
   const net=inc-out;
@@ -841,6 +920,7 @@ const CAT_CLASS = {
   Food:'p-food', Transport:'p-transport', Lifestyle:'p-lifestyle',
   Necessity:'p-necessity', Subscription:'p-subscription', Travel:'p-travel',
   Investments:'p-investments', Salary:'p-salary', Interest:'p-interest',
+  Installment:'p-installment',
 };
 function catPill(cat) {
   const cls = CAT_CLASS[cat] || '';
@@ -864,7 +944,7 @@ function renderTable() {
   view.forEach(t=>{
     const mo=t.date.slice(0,7);
     if(mo!==lastMo&&sortK==='date'){rows+=`<tr class="tr-month"><td colspan="7">${fmtMo(mo)}</td></tr>`;lastMo=mo;}
-    const isOut=t.type==='Expenses'||t.type==='Investments';
+    const isOut=OUT_TYPES.has(t.type);
     const id=esc(t.id);
     rows+=`<tr class="tr-tx" onclick="openEdit('${id}')">
       <td class="td-date">${fmtDay(t.date)}</td>
@@ -893,7 +973,7 @@ function renderTable() {
   view.forEach(t=>{
     const mo=t.date.slice(0,7);
     if(mo!==lastMoC&&sortK==='date'){cards+=`<div class="mo-sep">${fmtMo(mo)}</div>`;lastMoC=mo;}
-    const isOut=t.type==='Expenses'||t.type==='Investments';
+    const isOut=OUT_TYPES.has(t.type);
     const id=esc(t.id);
     cards+=`<div class="tx-card" onclick="openEdit('${id}')">
       <div class="txc-row1">
@@ -994,7 +1074,7 @@ let chartDrillCat = null; // null = overview, string = drilled category
 // Build pay periods from salary transactions; each period carries its expense txs
 function getPayPeriods() {
   const salaries = txs.filter(t=>t.category==='Salary').sort((a,b)=>a.date.localeCompare(b.date));
-  const expenses = txs.filter(t=>t.type==='Expenses'||t.type==='Investments');
+  const expenses = txs.filter(t=>OUT_TYPES.has(t.type));
   const periods  = [];
 
   if (!salaries.length) {
@@ -1117,7 +1197,7 @@ function renderCategoryDrill(el, cat, period) {
   const catTxs  = period.txs.filter(t=>t.category===cat).sort((a,b)=>b.date.localeCompare(a.date));
   const totalOut = catTxs.reduce((s,t)=>s+t.amount,0);
   const rows = catTxs.map(t=>{
-    const isOut=t.type==='Expenses'||t.type==='Investments';
+    const isOut=OUT_TYPES.has(t.type);
     return `<div class="drill-row" onclick="openEdit('${esc(t.id)}')">
       <span class="drill-date">${fmtDay(t.date)}</span>
       <span class="drill-desc">${esc(t.description)}</span>
@@ -1135,7 +1215,155 @@ function renderCategoryDrill(el, cat, period) {
     ${rows||`<div class="empty"><div class="empty-ico">—</div><p>No transactions in this category for this period.</p></div>`}`;
 }
 
-// ═══ Modals ════════════════════════════════════════════════════
+// ═══ Credit Cards view ═════════════════════════════════════════
+function getCard(name) {
+  if (!cards[name]) cards[name] = { points:0, statements:[] };
+  if (!cards[name].statements) cards[name].statements = [];
+  return cards[name];
+}
+
+function dueLblCC(dueDateStr, paid) {
+  if (!dueDateStr) return { text:'No due date', cls:'ok' };
+  if (paid) return { text:'Due ' + fmtDay(dueDateStr), cls:'ok' };
+  const today = new Date(); today.setHours(0,0,0,0);
+  const due   = new Date(dueDateStr); due.setHours(0,0,0,0);
+  const diff  = Math.round((due - today) / 86400000);
+  if (diff < 0)  return { text:`Overdue by ${Math.abs(diff)}d`, cls:'overdue' };
+  if (diff === 0) return { text:'Due today!', cls:'overdue' };
+  if (diff <= 7)  return { text:`Due in ${diff}d`, cls:'soon' };
+  return { text:'Due ' + fmtDay(dueDateStr), cls:'ok' };
+}
+
+function renderCC() {
+  const el = document.getElementById('ccWrap');
+  if (!txs.length) { el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No transactions loaded yet.</p></div>`; return; }
+
+  const CC_CARDS = [...CC]; // ['Citi Rewards','HSBC','Trust','UOB Ladys']
+
+  el.innerHTML = CC_CARDS.map(cardName => {
+    const card     = getCard(cardName);
+    const unstmtd  = txs.filter(t => t.card===cardName && OUT_TYPES.has(t.type) && !t.statementd);
+    const pending  = unstmtd.filter(t => t.pending);
+    const confirmed= unstmtd.filter(t => !t.pending);
+    const pendAmt  = pending.reduce((s,t)=>s+t.amount, 0);
+    const confAmt  = confirmed.reduce((s,t)=>s+t.amount, 0);
+    const totalOwing = pendAmt + confAmt;
+    const pts      = (card.points||0).toLocaleString();
+    const cn       = esc(cardName);
+
+    // Outstanding section
+    const outCells = [];
+    if (pending.length)   outCells.push(`<div class="cc-out-cell"><div class="cc-out-cell-lbl" style="color:#f59e0b">● Pending</div><div class="cc-out-cell-val" style="color:#f59e0b">${fmt(pendAmt)}</div><div class="cc-out-cell-sub">${pending.length} txn${pending.length!==1?'s':''}</div></div>`);
+    if (confirmed.length) outCells.push(`<div class="cc-out-cell"><div class="cc-out-cell-lbl" style="color:var(--w2)">○ Confirmed</div><div class="cc-out-cell-val" style="color:var(--w2)">${fmt(confAmt)}</div><div class="cc-out-cell-sub">${confirmed.length} txn${confirmed.length!==1?'s':''}</div></div>`);
+
+    const outSection = outCells.length
+      ? `<div class="cc-out-grid">${outCells.join('')}<div class="cc-out-total"><div class="cc-out-total-lbl">Total owing</div><div class="cc-out-total-val">${fmt(totalOwing)}</div></div></div>`
+      : `<div style="font-size:12px;color:var(--w3)">Nothing outstanding — all transactions are statemeneted.</div>`;
+
+    // Statements
+    const stmts = (card.statements||[]).slice().sort((a,b) => (b.statementDate||'').localeCompare(a.statementDate||''));
+    const stmtRows = stmts.map(s => {
+      const sid  = esc(s.id);
+      const due  = dueLblCC(s.dueDate, s.paid);
+      return `<div class="cc-stmt">
+        <span class="cc-stmt-date">${fmtDay(s.statementDate)}</span>
+        <span class="cc-stmt-amt">${fmt(s.amount)}</span>
+        <span class="cc-stmt-due ${due.cls}">${due.text}</span>
+        <span class="cc-stmt-paid" onclick="togglePaid('${cn}','${sid}')">
+          ${s.paid
+            ? '<span style="color:#4ade80">● Paid</span>'
+            : '<span style="color:var(--w3)">○ Unpaid</span>'}
+        </span>
+        <button class="del-btn" onclick="deleteStatement('${cn}','${sid}')">×</button>
+      </div>`;
+    }).join('') || `<div class="cc-no-stmt">No statements yet — click + Add to record one.</div>`;
+
+    return `<div class="cc-section">
+      <div class="cc-head">
+        <span class="cc-head-name">${esc(cardName)}</span>
+        <div class="cc-head-pts">
+          <span class="cc-pts-lbl">Points</span>
+          <span class="cc-pts-val" id="cc-pts-${cn.replace(/ /g,'-')}">${pts}</span>
+          <button class="btn" style="padding:3px 8px;font-size:11px" onclick="editPoints('${cn}')">✎</button>
+        </div>
+      </div>
+      <div class="cc-outstanding">
+        <div class="cc-out-lbl">Outstanding (not statemeneted)</div>
+        ${outSection}
+      </div>
+      <div class="cc-stmts-head">
+        <span class="cc-stmts-lbl">Statements</span>
+        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="openAddStatement('${cn}')">+ Add</button>
+      </div>
+      ${stmtRows}
+    </div>`;
+  }).join('');
+}
+
+// ── Points inline edit ──────────────────────────────────────────
+function editPoints(cardName) {
+  const key = 'cc-pts-' + cardName.replace(/ /g,'-');
+  const el  = document.getElementById(key);
+  if (!el) return;
+  const cur = (getCard(cardName).points || 0);
+  el.outerHTML = `<input class="cc-pts-input" id="${key}-inp" type="number" value="${cur}"
+    onblur="savePoints('${esc(cardName)}',this.value)"
+    onkeydown="if(event.key==='Enter')this.blur();if(event.key==='Escape')renderCC()">`;
+  const inp = document.getElementById(key + '-inp');
+  if (inp) { inp.focus(); inp.select(); }
+}
+async function savePoints(cardName, value) {
+  getCard(cardName).points = Math.max(0, parseInt(value)||0);
+  renderCC();
+  try { await save(); } catch(_) {}
+}
+
+// ── Statement CRUD ──────────────────────────────────────────────
+function openAddStatement(cardName) {
+  stmtEditCard = cardName;
+  stmtEditId   = null;
+  document.getElementById('mStmtTitle').textContent = 'Add Statement — ' + cardName;
+  document.getElementById('sfStmtAmt').value  = '';
+  document.getElementById('sfStmtDate').value = '';
+  document.getElementById('sfStmtDue').value  = '';
+  document.getElementById('sfStmtPaid').checked = false;
+  openModal('mStmt');
+  setTimeout(()=>document.getElementById('sfStmtAmt').focus(), 80);
+}
+async function saveStatement() {
+  const amt  = parseFloat(document.getElementById('sfStmtAmt').value);
+  const date = document.getElementById('sfStmtDate').value;
+  if (!date || isNaN(amt) || amt < 0) { toast('Amount and statement date required','bad'); return; }
+  const card = getCard(stmtEditCard);
+  const stmt = {
+    id:            stmtEditId || crypto.randomUUID(),
+    amount:        amt,
+    statementDate: date,
+    dueDate:       document.getElementById('sfStmtDue').value  || null,
+    paid:          document.getElementById('sfStmtPaid').checked,
+  };
+  if (stmtEditId) {
+    const i = card.statements.findIndex(s=>s.id===stmtEditId);
+    if (i>=0) card.statements[i]=stmt; else card.statements.push(stmt);
+  } else {
+    card.statements.push(stmt);
+  }
+  closeModal('mStmt');
+  renderCC();
+  try { await save(); } catch(_) {}
+}
+async function deleteStatement(cardName, id) {
+  if (!confirm('Delete this statement?')) return;
+  getCard(cardName).statements = getCard(cardName).statements.filter(s=>s.id!==id);
+  renderCC();
+  try { await save(); } catch(_) {}
+}
+async function togglePaid(cardName, id) {
+  const stmt = getCard(cardName).statements.find(s=>s.id===id);
+  if (stmt) stmt.paid = !stmt.paid;
+  renderCC();
+  try { await save(); } catch(_) {}
+}
 function openModal(id)  { document.getElementById(id).classList.remove('off'); }
 function closeModal(id) { document.getElementById(id).classList.add('off'); }
 document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.add('off');}));
@@ -1181,6 +1409,9 @@ function syncType(existingType) {
     sel.disabled  = true;
   } else if (cat === 'Investments') {
     sel.innerHTML = '<option value="Investments">Investments</option>';
+    sel.disabled  = true;
+  } else if (cat === 'Installment') {
+    sel.innerHTML = '<option value="Installment">Installment</option>';
     sel.disabled  = true;
   } else {
     sel.innerHTML = '<option value="Expenses">Expenses</option><option value="Gain">Gain</option>';
