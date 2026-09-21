@@ -273,6 +273,17 @@
       "pending": false
     },
     {
+      "id": "ad128fb1-9065-4b7f-b1d2-d44993222f15",
+      "description": "Shopee",
+      "category": "Necessity",
+      "type": "Expenses",
+      "amount": 23.8,
+      "date": "2026-09-12",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "fedba9dc-0b2d-4242-a064-ee14e7ba9f5d",
       "description": "Pay Wayne",
       "category": "Lifestyle",
