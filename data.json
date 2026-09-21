@@ -10,6 +10,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "dbf96a16-8759-44e0-a892-cfec894815d8",
+      "description": "Game Conversion",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 0.14,
+      "date": "2026-09-19",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "1c5d9936-ddfc-4392-bea5-9cd2a0daa2d6",
       "description": "Game Conversion",
       "category": "Lifestyle",
