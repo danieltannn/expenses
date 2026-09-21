@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "9e19aaec-ee8a-406a-a4f0-3a63ac32b669",
+      "description": "Transport Fee",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 6.9,
+      "date": "2026-09-21",
+      "card": "DBS Debit"
+    },
+    {
       "id": "58ef09e3-757f-436f-ba0b-60df37cfe7bd",
       "description": "AIA",
       "category": "Subscription",
