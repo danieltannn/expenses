@@ -190,6 +190,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "295a363f-74af-4e6f-8d6c-56699cdc9c19",
+      "description": "Torbox Conversion Fee",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 0.16,
+      "date": "2026-08-31",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "20c019f3-fa30-4793-a783-1d0c52921517",
       "description": "Grab",
       "category": "Transport",
