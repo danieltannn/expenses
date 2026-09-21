@@ -154,6 +154,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "cad4cf78-b93b-4f32-bafa-372a5bae7e19",
+      "description": "Taobao",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 7,
+      "date": "2026-09-06",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "9c69009c-7320-4657-9b14-74d1f747ffbf",
       "description": "Apple",
       "category": "Subscription",
