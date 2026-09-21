@@ -82,6 +82,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "8f154ef3-24ff-42d1-80a3-453d0341eb9f",
+      "description": "Tada",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 29.89,
+      "date": "2026-09-10",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "3b0f7d7e-cc42-4be6-a0dc-19c7e7012825",
       "description": "Drinks",
       "category": "Food",
