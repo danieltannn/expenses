@@ -109,6 +109,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "6b94fcb8-74e8-4243-a0d1-b5cec344bada",
+      "description": "Gojek",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 28.9,
+      "date": "2026-09-09",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "e2a0ec46-c48b-4bc5-8447-70ba469e29c5",
       "description": "Transport Fee",
       "category": "Transport",
