@@ -818,6 +818,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "ade6e953-cce2-4e42-a427-1383deb13b0f",
+      "description": "Food",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 10.1,
+      "date": "2026-08-22",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "15b84c17-f60a-4739-8a9a-f7ac4e2bf4f0",
       "description": "Ryde",
       "category": "Transport",
