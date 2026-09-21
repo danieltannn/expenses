@@ -4189,7 +4189,15 @@
   "cards": {
     "Citi Rewards": {
       "points": 0,
-      "statements": []
+      "statements": [
+        {
+          "id": "cba040c1-00ba-435a-be8a-18a07f282322",
+          "amount": 1483.45,
+          "statementDate": "2026-09-19",
+          "dueDate": "2026-10-15",
+          "paid": true
+        }
+      ]
     },
     "HSBC": {
       "points": 0,
