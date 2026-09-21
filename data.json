@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "e2a0ec46-c48b-4bc5-8447-70ba469e29c5",
+      "description": "Transport Fee",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 2.56,
+      "date": "2026-09-09",
+      "card": "DBS Debit"
+    },
+    {
       "id": "83c8b28b-221f-4e2b-bf40-edb2d2c1b443",
       "description": "Investment",
       "category": "Investments",
