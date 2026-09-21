@@ -63,6 +63,17 @@
       "pending": false
     },
     {
+      "id": "6bdd7a4a-f209-457d-aca5-576a6d875f5d",
+      "description": "iPhone",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 1899,
+      "date": "2026-09-17",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": true
+    },
+    {
       "id": "67dd3a50-df22-4904-b95f-3f8b1d795302",
       "description": "Grab",
       "category": "Transport",
