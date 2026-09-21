@@ -830,8 +830,8 @@
     {
       "id": "451ec9df-75e9-4565-ae31-90efc8571630",
       "description": "Installment",
-      "category": "Subscription",
-      "type": "Expenses",
+      "category": "Installment",
+      "type": "Installment",
       "amount": 750,
       "date": "2026-09-01",
       "card": "HSBC",
