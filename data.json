@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "58ef09e3-757f-436f-ba0b-60df37cfe7bd",
+      "description": "AIA",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 1845.47,
+      "date": "2026-09-21",
+      "card": "DBS Debit"
+    },
+    {
       "id": "fedba9dc-0b2d-4242-a064-ee14e7ba9f5d",
       "description": "Pay Wayne",
       "category": "Lifestyle",
