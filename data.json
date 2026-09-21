@@ -208,6 +208,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "906298ea-b57d-4f98-af44-5a9ca1dc9a2d",
+      "description": "Spotify",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 16.98,
+      "date": "2026-08-29",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "16703fa5-c34a-417a-bee8-acb6f83bf73d",
       "description": "TorBox",
       "category": "Subscription",
