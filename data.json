@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "fedba9dc-0b2d-4242-a064-ee14e7ba9f5d",
+      "description": "Pay Wayne",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 21.3,
+      "date": "2026-09-12",
+      "card": "DBS Debit"
+    },
+    {
       "id": "6f4beaae-763a-4a14-ba6a-e442022e6433",
       "description": "Grab Back",
       "category": "Transport",
