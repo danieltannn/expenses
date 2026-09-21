@@ -82,6 +82,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "34b955f6-9778-4802-9ae3-ddc2fbe463bf",
+      "description": "Claude Conversion Fee",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 0.3,
+      "date": "2026-09-10",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "d6992ee8-cc37-4db8-ac1f-960f3ed2de7d",
       "description": "Grab",
       "category": "Transport",
