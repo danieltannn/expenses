@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "6f4beaae-763a-4a14-ba6a-e442022e6433",
+      "description": "Grab Back",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 17.55,
+      "date": "2026-09-12",
+      "card": "DBS Debit"
+    },
+    {
       "id": "3b0f7d7e-cc42-4be6-a0dc-19c7e7012825",
       "description": "Drinks",
       "category": "Food",
