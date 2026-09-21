@@ -739,8 +739,8 @@
     {
       "id": "81909898-0283-49f9-acbe-155424b0048d",
       "description": "Installment",
-      "category": "Subscription",
-      "type": "Expenses",
+      "category": "Installment",
+      "type": "Installment",
       "amount": 1338.35,
       "date": "2026-09-05",
       "card": "Trust",
