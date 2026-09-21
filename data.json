@@ -235,6 +235,15 @@
       "card": "DBS Debit"
     },
     {
+      "id": "15b84c17-f60a-4739-8a9a-f7ac4e2bf4f0",
+      "description": "Ryde",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 42.52,
+      "date": "2026-08-22",
+      "card": "DBS Debit"
+    },
+    {
       "id": "67dab6e2-1902-4172-a24b-4ef4e0e81650",
       "description": "Eat out pay back",
       "category": "Lifestyle",
