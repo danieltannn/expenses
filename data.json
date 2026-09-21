@@ -510,6 +510,17 @@
       "pending": false
     },
     {
+      "id": "c4257f7e-13d0-43c5-9449-02c2bb3641aa",
+      "description": "Cashback",
+      "category": "Food",
+      "type": "Gain",
+      "amount": 0.39,
+      "date": "2026-09-07",
+      "card": "Trust",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "6b30cad1-9d60-4b05-8d70-b16c4d376e0a",
       "description": "Grab",
       "category": "Transport",
