@@ -898,6 +898,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "e20138a8-9d8c-465e-b496-0c392f2e9922",
+      "description": "Shopee",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 24,
+      "date": "2026-08-21",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "d5dd97af-8f36-4cc3-a951-c23731ecd8ed",
       "description": "Lunch",
       "category": "Food",
