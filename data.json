@@ -572,6 +572,17 @@
       "pending": false
     },
     {
+      "id": "4316b3fe-cfa6-422c-ab09-65a2dddb8d54",
+      "description": "Food",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 61.68,
+      "date": "2026-09-05",
+      "card": "Trust",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "81909898-0283-49f9-acbe-155424b0048d",
       "description": "Installment",
       "category": "Subscription",
