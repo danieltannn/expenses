@@ -10,6 +10,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "f03adff7-cc04-4ed6-a341-2d429a6fa784",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 7.22,
+      "date": "2026-09-19",
+      "card": "Trust",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "0d699436-a71d-4942-92f6-81fda1574f22",
       "description": "Food",
       "category": "Food",
