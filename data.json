@@ -455,6 +455,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "8495a72e-3ba0-4710-894b-a205e31e54d1",
+      "description": "Transport Cashback",
+      "category": "Travel",
+      "type": "Gain",
+      "amount": 0.01,
+      "date": "2026-09-08",
+      "card": "Trust",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "2a82bfd1-1177-412e-9e3a-946dccb6ebcb",
       "description": "Grab",
       "category": "Transport",
