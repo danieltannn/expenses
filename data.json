@@ -28,6 +28,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "2b9b9761-2bda-40a3-9097-691d4af701dc",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 3,
+      "date": "2026-09-15",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "2c1a8461-01e7-4c71-b4f3-e747a55b2aec",
       "description": "Lifestyle",
       "category": "Lifestyle",
