@@ -630,6 +630,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "451ec9df-75e9-4565-ae31-90efc8571630",
+      "description": "Installment",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 750,
+      "date": "2026-09-01",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "6f8d3b4d-9050-43aa-bfa6-e8ddb64e205e",
       "description": "Grab",
       "category": "Transport",
