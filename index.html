@@ -177,6 +177,11 @@ td{padding:11px 14px;vertical-align:middle;overflow:hidden;text-overflow:ellipsi
 .period-nav-lbl{flex:1;text-align:center}
 .period-nav-title{font-size:13px;font-weight:600;color:var(--w1)}
 .period-nav-sub{font-size:11px;color:var(--w3);margin-top:2px}
+/* Salary summary bar inside pay period chart */
+.sal-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1);border-bottom:1px solid var(--b1)}
+.sal-cell{background:var(--bg);padding:10px 18px}
+.sal-lbl{font-size:10px;font-weight:500;color:var(--w3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.sal-val{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
 .pnav-btn{background:none;border:1px solid var(--b2);color:var(--w2);font-size:16px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-family:var(--font);flex-shrink:0}
 .pnav-btn:hover:not([disabled]){border-color:var(--w1);color:var(--w1)}
 .pnav-btn[disabled]{opacity:.25;cursor:default}
@@ -434,7 +439,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
     <span class="meta" id="metaCount"></span>
     <div class="tabs">
       <button class="btn btn-solid" id="btnTable" onclick="setView('table')">Transactions</button>
-      <button class="btn"           id="btnChart" onclick="setView('chart')">Pay Period Chart</button>
+      <button class="btn"           id="btnChart" onclick="setView('chart')">Monthly Expenses</button>
       <button class="btn"           id="btnSubs"  onclick="setView('subs')">Subscriptions</button>
       <button class="btn"           id="btnCC"    onclick="setView('cc')">Credit Cards</button>
     </div>
@@ -1075,10 +1080,16 @@ let chartDrillCat = null; // null = overview, string = drilled category
 function getPayPeriods() {
   const salaries = txs.filter(t=>t.category==='Salary').sort((a,b)=>a.date.localeCompare(b.date));
   const expenses = txs.filter(t=>OUT_TYPES.has(t.type));
-  const periods  = [];
+  // All salary transactions (for summing per period)
+  const allSalaryTxs = txs.filter(t=>t.category==='Salary');
+  const salaryInRange = (start, end) => allSalaryTxs.filter(t=>
+    (!start || t.date >= start) && (!end || t.date < end)
+  ).reduce((s,t)=>s+t.amount, 0);
+
+  const periods = [];
 
   if (!salaries.length) {
-    periods.push({ label:'All time', shortLabel:'All', txs:expenses });
+    periods.push({ label:'All time', shortLabel:'All', txs:expenses, salaryTotal:0, start:null, end:null });
     return periods;
   }
 
@@ -1086,7 +1097,14 @@ function getPayPeriods() {
   const pre = expenses.filter(t=>t.date<salaries[0].date);
   if (pre.length) {
     const earliest = pre.reduce((a,b)=>a.date<b.date?a:b).date;
-    periods.push({ label:`Before pay  (${fmtSho(earliest)} → ${fmtSho(salaries[0].date)})`, shortLabel:'Before pay', txs:pre });
+    periods.push({
+      label:`Before pay  (${fmtSho(earliest)} → ${fmtSho(salaries[0].date)})`,
+      shortLabel:'Before pay',
+      txs: pre,
+      salaryTotal: 0,
+      start: earliest,
+      end: salaries[0].date,
+    });
   }
 
   // One period per salary
@@ -1095,9 +1113,12 @@ function getPayPeriods() {
     const end   = i+1 < salaries.length ? salaries[i+1].date : null;
     const chunk = expenses.filter(t=>t.date>=start && (end===null||t.date<end));
     periods.push({
-      label:      `Pay ${i+1}  (${fmtSho(start)} → ${end?fmtSho(end):'now'})`,
-      shortLabel: `Pay ${i+1}`,
-      txs:        chunk,
+      label:       `Pay ${i+1}  (${fmtSho(start)} → ${end?fmtSho(end):'now'})`,
+      shortLabel:  `Pay ${i+1}`,
+      txs:         chunk,
+      salaryTotal: salaryInRange(start, end),
+      start,
+      end,
     });
   });
 
@@ -1169,6 +1190,25 @@ function renderChart() {
     </div>`;
   }).join('');
 
+  const salary    = period.salaryTotal || 0;
+  const remaining = salary - total;
+  const salBar = salary > 0
+    ? `<div class="sal-bar">
+        <div class="sal-cell">
+          <div class="sal-lbl">Salary received</div>
+          <div class="sal-val" style="color:#4ade80">+ ${fmt(salary)}</div>
+        </div>
+        <div class="sal-cell">
+          <div class="sal-lbl">Total spent</div>
+          <div class="sal-val" style="color:#f43f5e">− ${fmt(total)}</div>
+        </div>
+        <div class="sal-cell">
+          <div class="sal-lbl">${remaining>=0?'Remaining':'Over budget'}</div>
+          <div class="sal-val" style="color:${remaining>=0?'#4ade80':'#f43f5e'}">${remaining>=0?'+':'−'} ${fmt(Math.abs(remaining))}</div>
+        </div>
+      </div>`
+    : '';
+
   el.innerHTML=`
     <div class="period-nav">
       <button class="pnav-btn" onclick="navPeriod(-1)" ${idx===0?'disabled':''}>←</button>
@@ -1178,6 +1218,7 @@ function renderChart() {
       </div>
       <button class="pnav-btn" onclick="navPeriod(1)" ${idx===periods.length-1?'disabled':''}>→</button>
     </div>
+    ${salBar}
     <div class="chart-inner">
       <div class="chart-donut-col">
         ${buildCategoryDonut(segments,total)}
@@ -1186,9 +1227,9 @@ function renderChart() {
         </div>
       </div>
       <div class="chart-legend-col">
-        <div class="chart-legend-head">Spending by category — click any slice or row</div>
+        <div class="chart-legend-head">Monthly expenses by category — click any slice or row</div>
         ${legendRows}
-        <div class="chart-total-row"><div></div><div class="leg-label">Total</div><div class="leg-pct">100%</div><div class="leg-amt">${fmt(total)}</div></div>
+        <div class="chart-total-row"><div></div><div class="leg-label">Total spent</div><div class="leg-pct">100%</div><div class="leg-amt" style="color:#f43f5e">${fmt(total)}</div></div>
       </div>
     </div>`;
 }
