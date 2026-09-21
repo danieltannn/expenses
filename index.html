@@ -52,12 +52,25 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 
 /* ── Filters ── */
 .filters{padding:8px 12px;background:var(--s1);border:1px solid var(--b1);margin-bottom:10px}
-.f-drops{display:flex;gap:5px;align-items:center}
-.f-drops .fi{flex:1;min-width:0;font-size:11px;padding:5px 6px}
-.fi{background:var(--bg);border:1px solid var(--b2);color:var(--w1);padding:6px 10px;font-size:12px;font-family:var(--font);outline:none;transition:border-color .15s}
-.fi:focus{border-color:var(--w1)}
-select.fi option{background:var(--s2)}
-.fi-reset{background:none;border:none;color:var(--w3);font-size:13px;cursor:pointer;padding:4px 8px;font-family:var(--font);transition:color .15s;flex-shrink:0}
+.f-drops{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.date-fi{background:var(--bg);border:1px solid var(--b2);color:var(--w1);padding:5px 7px;font-size:11px;font-family:var(--font);outline:none;height:30px;width:118px;flex-shrink:0;transition:border-color .15s}
+.date-fi:focus{border-color:var(--w1)}
+.date-sep{font-size:11px;color:var(--w3);flex-shrink:0}
+/* Multi-select dropdowns */
+.mf-wrap{position:relative}
+.mf-btn{background:var(--bg);border:1px solid var(--b2);color:var(--w2);padding:5px 10px;font-size:11px;font-family:var(--font);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;height:30px}
+.mf-btn:hover,.mf-btn.open{border-color:var(--w1);color:var(--w1)}
+.mf-badge{background:var(--w1);color:var(--bg);font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;padding:0 3px;line-height:1}
+.mf-panel{position:absolute;top:calc(100% + 4px);left:0;z-index:200;background:var(--s1);border:1px solid var(--b2);min-width:165px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.mf-inner{max-height:220px;overflow-y:auto}
+.mf-opt{display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:12px;color:var(--w2);cursor:pointer;user-select:none;transition:background .1s}
+.mf-opt:hover{background:var(--s2);color:var(--w1)}
+.mf-opt input{accent-color:var(--w1);cursor:pointer;width:13px;height:13px;flex-shrink:0}
+.mf-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.mf-foot{border-top:1px solid var(--b1);padding:5px 8px}
+.mf-clr{background:none;border:none;color:var(--w3);font-size:11px;cursor:pointer;font-family:var(--font);padding:2px 4px;transition:color .15s}
+.mf-clr:hover{color:var(--w1)}
+.fi-reset{background:none;border:none;color:var(--w3);font-size:13px;cursor:pointer;padding:4px 8px;font-family:var(--font);transition:color .15s;flex-shrink:0;height:30px}
 .fi-reset:hover{color:var(--w1)}
 
 /* ── View bar ── */
@@ -299,31 +312,75 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 
   <!-- Filters (table-only) -->
   <div class="filters" id="filtersBar">
-    <div class="f-drops" id="fDrops">
-      <select class="fi" id="fMonth" onchange="render()"><option value="">All months</option></select>
-      <select class="fi" id="fCat" onchange="render()">
-        <option value="">All categories</option>
-        <option>Food</option><option>Transport</option><option>Lifestyle</option>
-        <option>Necessity</option><option>Subscription</option><option>Travel</option>
-        <option>Investments</option><option>Salary</option><option>Interest</option>
-      </select>
-      <select class="fi" id="fCard" onchange="render()">
-        <option value="">All cards</option>
-        <option>DBS Debit</option><option>Citi Rewards</option>
-        <option>HSBC</option><option>Trust</option><option>UOB Ladys</option>
-      </select>
-      <select class="fi" id="fType" onchange="render()">
-        <option value="">All types</option>
-        <option>Expenses</option><option>Gain</option><option>Investments</option><option>Salary</option>
-      </select>
-      <select class="fi" id="fStatus" onchange="render()">
-        <option value="">All statuses</option>
-        <option value="stmtd">Statemeneted</option>
-        <option value="pending">Pending</option>
-        <option value="clearing">Confirmed</option>
-        <option value="debit">Debit only</option>
-      </select>
-      <button class="fi-reset" onclick="resetFilters()">✕</button>
+    <div class="f-drops">
+      <!-- Date range -->
+      <input class="date-fi" type="date" id="dateFrom" onchange="render()" title="From date">
+      <span class="date-sep">→</span>
+      <input class="date-fi" type="date" id="dateTo"   onchange="render()" title="To date">
+
+      <!-- Category -->
+      <div class="mf-wrap">
+        <button class="mf-btn" id="mfb-cats" onclick="toggleMF(event,'cats')">Category <span class="mf-badge" id="mf-count-cats" style="display:none"></span></button>
+        <div class="mf-panel" id="mf-cats" style="display:none">
+          <div class="mf-inner">
+            <label class="mf-opt"><input type="checkbox" value="Food"         onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#f59e0b"></div>Food</label>
+            <label class="mf-opt"><input type="checkbox" value="Transport"    onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#38bdf8"></div>Transport</label>
+            <label class="mf-opt"><input type="checkbox" value="Lifestyle"    onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#a78bfa"></div>Lifestyle</label>
+            <label class="mf-opt"><input type="checkbox" value="Necessity"    onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#34d399"></div>Necessity</label>
+            <label class="mf-opt"><input type="checkbox" value="Subscription" onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#fb7185"></div>Subscription</label>
+            <label class="mf-opt"><input type="checkbox" value="Travel"       onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#2dd4bf"></div>Travel</label>
+            <label class="mf-opt"><input type="checkbox" value="Investments"  onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#fbbf24"></div>Investments</label>
+            <label class="mf-opt"><input type="checkbox" value="Salary"       onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#4ade80"></div>Salary</label>
+            <label class="mf-opt"><input type="checkbox" value="Interest"     onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#818cf8"></div>Interest</label>
+          </div>
+          <div class="mf-foot"><button class="mf-clr" onclick="mfClear('cats')">Clear</button></div>
+        </div>
+      </div>
+
+      <!-- Card -->
+      <div class="mf-wrap">
+        <button class="mf-btn" id="mfb-cards" onclick="toggleMF(event,'cards')">Card <span class="mf-badge" id="mf-count-cards" style="display:none"></span></button>
+        <div class="mf-panel" id="mf-cards" style="display:none">
+          <div class="mf-inner">
+            <label class="mf-opt"><input type="checkbox" value="DBS Debit"    onchange="mfChange('cards',this.value,this.checked)">DBS Debit</label>
+            <label class="mf-opt"><input type="checkbox" value="Citi Rewards" onchange="mfChange('cards',this.value,this.checked)">Citi Rewards</label>
+            <label class="mf-opt"><input type="checkbox" value="HSBC"         onchange="mfChange('cards',this.value,this.checked)">HSBC</label>
+            <label class="mf-opt"><input type="checkbox" value="Trust"        onchange="mfChange('cards',this.value,this.checked)">Trust</label>
+            <label class="mf-opt"><input type="checkbox" value="UOB Ladys"    onchange="mfChange('cards',this.value,this.checked)">UOB Ladys</label>
+          </div>
+          <div class="mf-foot"><button class="mf-clr" onclick="mfClear('cards')">Clear</button></div>
+        </div>
+      </div>
+
+      <!-- Type -->
+      <div class="mf-wrap">
+        <button class="mf-btn" id="mfb-types" onclick="toggleMF(event,'types')">Type <span class="mf-badge" id="mf-count-types" style="display:none"></span></button>
+        <div class="mf-panel" id="mf-types" style="display:none">
+          <div class="mf-inner">
+            <label class="mf-opt"><input type="checkbox" value="Expenses"    onchange="mfChange('types',this.value,this.checked)">Expenses</label>
+            <label class="mf-opt"><input type="checkbox" value="Gain"        onchange="mfChange('types',this.value,this.checked)">Gain</label>
+            <label class="mf-opt"><input type="checkbox" value="Investments" onchange="mfChange('types',this.value,this.checked)">Investments</label>
+            <label class="mf-opt"><input type="checkbox" value="Salary"      onchange="mfChange('types',this.value,this.checked)">Salary</label>
+          </div>
+          <div class="mf-foot"><button class="mf-clr" onclick="mfClear('types')">Clear</button></div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="mf-wrap">
+        <button class="mf-btn" id="mfb-statuses" onclick="toggleMF(event,'statuses')">Status <span class="mf-badge" id="mf-count-statuses" style="display:none"></span></button>
+        <div class="mf-panel" id="mf-statuses" style="display:none">
+          <div class="mf-inner">
+            <label class="mf-opt"><input type="checkbox" value="stmtd"   onchange="mfChange('statuses',this.value,this.checked)">Statemeneted</label>
+            <label class="mf-opt"><input type="checkbox" value="pending"  onchange="mfChange('statuses',this.value,this.checked)">Pending</label>
+            <label class="mf-opt"><input type="checkbox" value="clearing" onchange="mfChange('statuses',this.value,this.checked)">Confirmed</label>
+            <label class="mf-opt"><input type="checkbox" value="debit"    onchange="mfChange('statuses',this.value,this.checked)">Debit only</label>
+          </div>
+          <div class="mf-foot"><button class="mf-clr" onclick="mfClear('statuses')">Clear</button></div>
+        </div>
+      </div>
+
+      <button class="fi-reset" onclick="resetFilters()">✕ Reset</button>
     </div>
   </div>
 
@@ -570,7 +627,6 @@ async function load() {
     const data=await ghGet();
     txs  = (data.transactions  ||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
     subs = (data.subscriptions ||[]).slice();
-    rebuildMonthFilter();
     render();
   } catch(e) {
     setStatus('err','Error');
@@ -606,48 +662,86 @@ function fabClick() {
   else openAdd();
 }
 
-// ═══ Filters / Sort ════════════════════════════════════════════
-function rebuildMonthFilter() {
-  const months=[...new Set(txs.map(t=>t.date.slice(0,7)))].sort().reverse();
-  const sel=document.getElementById('fMonth');
-  sel.innerHTML='<option value="">All months</option>';
-  months.forEach(m=>{const[y,mo]=m.split('-');const lbl=new Date(+y,+mo-1,1).toLocaleString('en-SG',{month:'long',year:'numeric'});sel.innerHTML+=`<option value="${m}">${lbl}</option>`;});
-}
-function render() {
-  const month =document.getElementById('fMonth').value;
-  const cat   =document.getElementById('fCat').value;
-  const card  =document.getElementById('fCard').value;
-  const type  =document.getElementById('fType').value;
-  const st    =document.getElementById('fStatus').value;
+// ═══ Multi-filter state ════════════════════════════════════════
+const filterState = { cats:[], cards:[], types:[], statuses:[] };
 
-  view=txs.filter(t=>{
-    if(month&&!t.date.startsWith(month)) return false;
-    if(cat&&t.category!==cat) return false;
-    if(card&&t.card!==card) return false;
-    if(type&&t.type!==type) return false;
-    if(st){
-      const isCC=CC.has(t.card);
-      if(st==='debit' &&  isCC) return false;
-      if(st==='debit' && !isCC) return true;
-      // For CC-specific statuses: debit counts as always statemeneted, excluded from pending/confirmed
-      if(st==='stmtd'  && !isCC) return true;   // debit = always statemeneted ✓
-      if(!isCC) return false;                     // debit excluded from pending/confirmed filters
-      if(st==='pending'  && !t.pending)              return false;
-      if(st==='stmtd'    && !t.statementd)           return false;
-      if(st==='clearing' && (t.statementd||t.pending)) return false;
+function toggleMF(event, key) {
+  event.stopPropagation();
+  const panel  = document.getElementById('mf-' + key);
+  const isOpen = panel.style.display !== 'none';
+  // Close all panels first
+  document.querySelectorAll('.mf-panel').forEach(p  => { p.style.display='none'; });
+  document.querySelectorAll('.mf-btn')  .forEach(b  => b.classList.remove('open'));
+  if (!isOpen) {
+    panel.style.display = 'block';
+    document.getElementById('mfb-' + key).classList.add('open');
+    // Flip panel to right-align if it would overflow
+    const rect = panel.getBoundingClientRect();
+    if (rect.right > window.innerWidth - 8) { panel.style.left='auto'; panel.style.right='0'; }
+    else                                     { panel.style.left='0';    panel.style.right='auto'; }
+  }
+}
+document.addEventListener('click', () => {
+  document.querySelectorAll('.mf-panel').forEach(p => { p.style.display='none'; });
+  document.querySelectorAll('.mf-btn')  .forEach(b => b.classList.remove('open'));
+});
+
+function mfChange(key, value, checked) {
+  if (checked) { if (!filterState[key].includes(value)) filterState[key].push(value); }
+  else         { filterState[key] = filterState[key].filter(v => v !== value); }
+  const n = filterState[key].length;
+  const badge = document.getElementById('mf-count-' + key);
+  if (badge) { badge.textContent = n; badge.style.display = n ? 'inline-flex' : 'none'; }
+  render();
+}
+
+function mfClear(key) {
+  filterState[key] = [];
+  document.querySelectorAll(`#mf-${key} input[type="checkbox"]`).forEach(cb => { cb.checked = false; });
+  const badge = document.getElementById('mf-count-' + key);
+  if (badge) badge.style.display = 'none';
+  render();
+}
+
+// ═══ Filters / Sort ════════════════════════════════════════════
+function render() {
+  const dateFrom = (document.getElementById('dateFrom')||{}).value || '';
+  const dateTo   = (document.getElementById('dateTo')  ||{}).value || '';
+  const { cats, cards, types, statuses } = filterState;
+
+  view = txs.filter(t => {
+    if (dateFrom && t.date < dateFrom) return false;
+    if (dateTo   && t.date > dateTo)   return false;
+    if (cats.length     && !cats.includes(t.category))  return false;
+    if (cards.length    && !cards.includes(t.card))     return false;
+    if (types.length    && !types.includes(t.type))     return false;
+    if (statuses.length) {
+      const isCC = CC.has(t.card);
+      const pass = statuses.some(st => {
+        if (st === 'debit')    return !isCC;
+        if (st === 'stmtd')    return !isCC || t.statementd;
+        if (st === 'pending')  return isCC && t.pending;
+        if (st === 'clearing') return isCC && !t.statementd && !t.pending;
+        return false;
+      });
+      if (!pass) return false;
     }
     return true;
   });
-  view.sort((a,b)=>sortK==='amount'?sortD*(a.amount-b.amount):sortD*String(a[sortK]).localeCompare(String(b[sortK])));
+  view.sort((a,b) => sortK==='amount' ? sortD*(a.amount-b.amount) : sortD*String(a[sortK]).localeCompare(String(b[sortK])));
 
   renderCatSpending();
   renderMeta();
-  if(viewMode==='table') renderTable();
-  else if(viewMode==='chart') renderChart();
+  if (viewMode==='table') renderTable();
+  else if (viewMode==='chart') renderChart();
   else renderSubs();
 }
 function toggleSort(k) { if(sortK===k) sortD*=-1; else{sortK=k;sortD=-1;} render(); }
-function resetFilters() { ['fMonth','fCat','fCard','fType','fStatus'].forEach(id=>{document.getElementById(id).value='';}); render(); }
+function resetFilters() {
+  const df=document.getElementById('dateFrom'); if(df) df.value='';
+  const dt=document.getElementById('dateTo');   if(dt) dt.value='';
+  ['cats','cards','types','statuses'].forEach(key => mfClear(key));
+}
 
 // ═══ Monthly category spending bar ════════════════════════════
 const CAT_COLOR = {
@@ -1096,7 +1190,7 @@ async function saveTx() {
   const isEditSalary = !!id && t.category === 'Salary';
   if(id){const i=txs.findIndex(x=>x.id===id);if(i>=0)txs[i]=t;else txs.unshift(t);}else txs.unshift(t);
   txs.sort((a,b)=>b.date.localeCompare(a.date));
-  closeModal('mAdd'); rebuildMonthFilter(); render();
+  closeModal('mAdd'); render();
   if (isNewSalary || isEditSalary) {
     toast(isNewSalary ? 'Salary added' : 'Salary updated');
     if (viewMode !== 'chart') setTimeout(() => setView('chart'), 80);
@@ -1106,7 +1200,7 @@ async function saveTx() {
 async function deleteTx(id) {
   if(!confirm('Delete this transaction?')) return;
   const wasSalary = txs.find(t=>t.id===id)?.category === 'Salary';
-  txs=txs.filter(t=>t.id!==id); rebuildMonthFilter(); render();
+  txs=txs.filter(t=>t.id!==id); render();
   if (wasSalary) {
     toast('Pay period removed');
     if (viewMode !== 'chart') setTimeout(() => setView('chart'), 80);
