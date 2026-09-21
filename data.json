@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "0f72ca20-00f2-43f9-ae39-de571b7dfb4c",
+      "description": "Government Give Money",
+      "category": "Lifestyle",
+      "type": "Gain",
+      "amount": 400,
+      "date": "2026-09-07",
+      "card": "DBS Debit"
+    },
+    {
       "id": "bfe18f21-d8c0-40d3-bc16-e2be59238348",
       "description": "Food",
       "category": "Food",
