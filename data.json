@@ -136,6 +136,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "2a82bfd1-1177-412e-9e3a-946dccb6ebcb",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 23.7,
+      "date": "2026-09-08",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "7f3490c6-3ff7-4fc3-931e-076bf3f9c6fb",
       "description": "Apple Conversion",
       "category": "Subscription",
