@@ -154,6 +154,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "1c3a7184-9fa4-4276-ab6b-ed98837ce8aa",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 18.44,
+      "date": "2026-09-03",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "c176481f-358e-41bd-90ce-6b281eb7c6d9",
       "description": "Drinks Vending Machine",
       "category": "Food",
