@@ -572,6 +572,17 @@
       "pending": false
     },
     {
+      "id": "a3039a08-7ca6-4de3-a974-04a85104cf7d",
+      "description": "Medicine",
+      "category": "Necessity",
+      "type": "Expenses",
+      "amount": 15.59,
+      "date": "2026-09-05",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "4316b3fe-cfa6-422c-ab09-65a2dddb8d54",
       "description": "Food",
       "category": "Food",
