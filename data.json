@@ -136,6 +136,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "752af11a-01f4-4405-ac1a-511cfe4dafb0",
+      "description": "Food",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 8.5,
+      "date": "2026-09-08",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "261c765b-8ea2-4a9e-8d86-bfb0b331ab87",
       "description": "Food",
       "category": "Food",
