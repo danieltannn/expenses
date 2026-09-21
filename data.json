@@ -109,6 +109,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "b86c3102-4b55-4988-9e6d-34c8df37f545",
+      "description": "Claude",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 30,
+      "date": "2026-09-09",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "6b94fcb8-74e8-4243-a0d1-b5cec344bada",
       "description": "Gojek",
       "category": "Transport",
