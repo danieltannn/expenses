@@ -10,6 +10,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "b1feb3a6-4df1-44fe-b669-981cebae1a13",
+      "description": "Cross Border",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 1.75,
+      "date": "2026-09-20",
+      "card": "Trust",
+      "statementd": false,
+      "pending": true
+    },
+    {
       "id": "1336fc5b-cef8-4dbd-a517-61cefc1bd100",
       "description": "Cross Border",
       "category": "Transport",
