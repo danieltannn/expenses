@@ -1,6 +1,15 @@
 {
   "transactions": [
     {
+      "id": "7cd97b55-4545-404e-a9a4-77f6628157d5",
+      "description": "Salary",
+      "category": "Salary",
+      "type": "Salary",
+      "amount": 16863.3,
+      "date": "2026-09-09",
+      "card": "DBS Debit"
+    },
+    {
       "id": "0f72ca20-00f2-43f9-ae39-de571b7dfb4c",
       "description": "Government Give Money",
       "category": "Lifestyle",
