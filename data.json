@@ -28,6 +28,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "2c1a8461-01e7-4c71-b4f3-e747a55b2aec",
+      "description": "Lifestyle",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 526.62,
+      "date": "2026-09-15",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "9e19aaec-ee8a-406a-a4f0-3a63ac32b669",
       "description": "Transport Fee",
       "category": "Transport",
