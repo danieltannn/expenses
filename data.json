@@ -572,6 +572,17 @@
       "pending": false
     },
     {
+      "id": "81909898-0283-49f9-acbe-155424b0048d",
+      "description": "Installment",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 1338.35,
+      "date": "2026-09-05",
+      "card": "Trust",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "739255fc-adb8-4da4-a707-172c5df09761",
       "description": "Grab",
       "category": "Transport",
