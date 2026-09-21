@@ -1,17 +1,6 @@
 {
   "transactions": [
     {
-      "id": "6e6255ef-5be1-4df5-8cde-e093a7e1459e",
-      "description": "Grab",
-      "category": "Transport",
-      "type": "Expenses",
-      "amount": 25.9,
-      "date": "2026-09-24",
-      "card": "Citi Rewards",
-      "statementd": true,
-      "pending": false
-    },
-    {
       "id": "91da3c20-0b5b-495c-87d2-7dcadb0674a7",
       "description": "Shanghai Plane Ticket",
       "category": "Travel",
@@ -235,6 +224,17 @@
       "amount": 25.8,
       "date": "2026-08-28",
       "card": "DBS Debit"
+    },
+    {
+      "id": "6e6255ef-5be1-4df5-8cde-e093a7e1459e",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 25.9,
+      "date": "2026-08-24",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
     },
     {
       "id": "c188736a-041e-4cd3-a150-ac1504e2f89b",
