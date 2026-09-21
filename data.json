@@ -64,6 +64,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "cbcf9fbb-ecf9-405d-8b0e-4c9b0805093a",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 21.7,
+      "date": "2026-09-14",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "fedba9dc-0b2d-4242-a064-ee14e7ba9f5d",
       "description": "Pay Wayne",
       "category": "Lifestyle",
