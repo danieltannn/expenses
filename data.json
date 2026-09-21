@@ -583,7 +583,7 @@
       "amount": 0.39,
       "date": "2026-09-07",
       "card": "Trust",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
