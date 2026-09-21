@@ -208,6 +208,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "57c46355-0955-46cb-abb3-7043184e0fba",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 28.7,
+      "date": "2026-08-30",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "906298ea-b57d-4f98-af44-5a9ca1dc9a2d",
       "description": "Spotify",
       "category": "Subscription",
