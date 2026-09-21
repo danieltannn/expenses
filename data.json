@@ -1,6 +1,17 @@
 {
   "transactions": [
     {
+      "id": "d436b415-b8a8-49f0-b2dd-7de011acfca5",
+      "description": "Cashback",
+      "category": "Transport",
+      "type": "Gain",
+      "amount": 0.07,
+      "date": "2026-09-21",
+      "card": "Trust",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "91da3c20-0b5b-495c-87d2-7dcadb0674a7",
       "description": "Shanghai Plane Ticket",
       "category": "Travel",
