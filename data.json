@@ -82,6 +82,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "e9a768ce-12ce-430d-ac8d-206b4fea7998",
+      "description": "Tada",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 27.85,
+      "date": "2026-09-11",
+      "card": "Citi Rewards",
+      "statementd": true,
+      "pending": false
+    },
+    {
       "id": "17f2a7f1-0eaa-453d-808e-508758cddb18",
       "description": "Gojek",
       "category": "Transport",
