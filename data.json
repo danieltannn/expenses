@@ -34,6 +34,17 @@
       "pending": true
     },
     {
+      "id": "3bafd2fa-d487-4acd-9e18-2b28156d64d6",
+      "description": "UOB Flight",
+      "category": "Travel",
+      "type": "Expenses",
+      "amount": 61.4,
+      "date": "2026-09-21",
+      "card": "UOB Ladys",
+      "statementd": false,
+      "pending": true
+    },
+    {
       "id": "7685670f-4ee3-48a6-9625-f1f6a9a89a27",
       "description": "Grab",
       "category": "Transport",
