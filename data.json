@@ -51,7 +51,7 @@
       "date": "2026-09-20",
       "card": "Citi Rewards",
       "statementd": false,
-      "pending": true
+      "pending": false
     },
     {
       "id": "b1feb3a6-4df1-44fe-b669-981cebae1a13",
@@ -84,7 +84,7 @@
       "date": "2026-09-19",
       "card": "Citi Rewards",
       "statementd": false,
-      "pending": true
+      "pending": false
     },
     {
       "id": "a13479da-928c-4adc-ac91-285fbd4ecd90",
