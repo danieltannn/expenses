@@ -1,6 +1,17 @@
 {
   "transactions": [
     {
+      "id": "a1971220-04a6-48f5-b9ba-373228569a81",
+      "description": "Game",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 0.96,
+      "date": "2026-09-23",
+      "card": "Citi Rewards",
+      "statementd": false,
+      "pending": true
+    },
+    {
       "id": "4a83ecf4-cc20-4f27-a339-48f83d7b8042",
       "description": "Grab",
       "category": "Transport",
