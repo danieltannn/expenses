@@ -131,6 +131,7 @@ td{padding:11px 14px;vertical-align:middle;overflow:hidden;text-overflow:ellipsi
 .p-salary      {background:rgba(74,222,128,.12);color:#4ade80;border-color:rgba(74,222,128,.25)}
 .p-interest    {background:rgba(129,140,248,.12);color:#818cf8;border-color:rgba(129,140,248,.25)}
 .p-installment {background:rgba(249,115,22,.12); color:#f97316;border-color:rgba(249,115,22,.25)}
+.p-card-payment{background:rgba(148,163,184,.12);color:#94a3b8;border-color:rgba(148,163,184,.25)}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;font-size:11px;font-weight:500;white-space:nowrap;cursor:pointer;transition:opacity .15s}
 .badge:hover{opacity:.7}
 .b-pending{background:var(--w1);color:var(--bg)}
@@ -381,6 +382,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
             <label class="mf-opt"><input type="checkbox" value="Salary"       onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#4ade80"></div>Salary</label>
             <label class="mf-opt"><input type="checkbox" value="Interest"     onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#818cf8"></div>Interest</label>
             <label class="mf-opt"><input type="checkbox" value="Installment"  onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#f97316"></div>Installment</label>
+            <label class="mf-opt"><input type="checkbox" value="Card Payment" onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#94a3b8"></div>Card Payment</label>
           </div>
           <div class="mf-foot"><button class="mf-clr" onclick="mfClear('cats')">Clear</button></div>
         </div>
@@ -501,6 +503,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
           <button type="button" class="sel-opt" data-val="Salary"       onclick="selCat('Salary')">Salary</button>
           <button type="button" class="sel-opt" data-val="Interest"     onclick="selCat('Interest')">Interest</button>
           <button type="button" class="sel-opt" data-val="Installment"  onclick="selCat('Installment')">Installment</button>
+          <button type="button" class="sel-opt" data-val="Card Payment" onclick="selCat('Card Payment')">Card Payment</button>
         </div>
       </div>
 
@@ -644,7 +647,14 @@ const REPO_OWNER  = 'danieltannn';
 const REPO_NAME   = 'expenses';
 const REPO_BRANCH = 'main';
 
-const getToken  = ()  => localStorage.getItem(CFG_K) || '';
+const getToken = () => {
+  const raw = localStorage.getItem(CFG_K) || '';
+  // Handle old JSON config format: {"owner":...,"token":"ghp_..."} stored at same key
+  if (raw.startsWith('{')) {
+    try { return JSON.parse(raw).token || ''; } catch(_) { return ''; }
+  }
+  return raw;
+};
 const saveToken = tok => localStorage.setItem(CFG_K, tok);
 const CYCLE_MUL = { weekly:52/12, monthly:1, quarterly:1/3, 'half-yearly':1/6, yearly:1/12 };
 const CYCLE_LBL = { weekly:'Weekly', monthly:'Monthly', quarterly:'Quarterly', 'half-yearly':'Half-yearly', yearly:'Yearly' };
@@ -877,7 +887,7 @@ const CAT_COLOR = {
   Food:'#f59e0b', Transport:'#38bdf8', Lifestyle:'#a78bfa',
   Necessity:'#34d399', Subscription:'#fb7185', Travel:'#2dd4bf',
   Investments:'#fbbf24', Salary:'#4ade80', Interest:'#818cf8',
-  Installment:'#f97316',
+  Installment:'#f97316', 'Card Payment':'#94a3b8',
 };
 
 function renderCatSpending() {
@@ -960,7 +970,7 @@ const CAT_CLASS = {
   Food:'p-food', Transport:'p-transport', Lifestyle:'p-lifestyle',
   Necessity:'p-necessity', Subscription:'p-subscription', Travel:'p-travel',
   Investments:'p-investments', Salary:'p-salary', Interest:'p-interest',
-  Installment:'p-installment',
+  Installment:'p-installment', 'Card Payment':'p-card-payment',
 };
 function catPill(cat) {
   const cls = CAT_CLASS[cat] || '';
