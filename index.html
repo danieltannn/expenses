@@ -341,29 +341,29 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   /* FAB bigger tap target */
   .fab{bottom:16px;right:16px;width:52px;height:52px}
   /* ── Credit Cards mobile ── */
+  .cc-wrap{overflow-x:hidden}
+  .cc-section{overflow-x:hidden}
+  .cc-outstanding{padding:10px 14px;overflow-x:hidden}
+  .cc-head{padding:10px 14px}
+  .cc-stmts-head{padding:7px 14px}
+  /* Stack outstanding grid vertically */
+  .cc-out-grid{flex-direction:column;gap:8px;align-items:flex-start}
+  .cc-out-total{margin-left:0;padding-top:6px;border-top:1px solid var(--b1);width:100%}
+  .cc-out-total-val{font-size:16px}
+  /* Statement row: compact card on mobile */
   .cc-stmt{
-    grid-template-columns:1fr auto;
-    grid-template-rows:auto auto auto;
-    gap:3px 10px;
+    display:block;
     padding:10px 14px;
   }
-  /* Row layout: date+delete / amount+paid / due */
-  .cc-stmt-date{grid-column:1;grid-row:1;font-size:11px}
-  .cc-stmt-amt {grid-column:1;grid-row:2;font-size:14px}
-  .cc-stmt-due {grid-column:1;grid-row:3;font-size:11px}
-  .cc-stmt-paid{grid-column:2;grid-row:1/3;align-self:center;flex-direction:column;gap:3px;font-size:11px}
-  /* Delete button: top-right */
-  .cc-stmt .del-btn{grid-column:2;grid-row:3;justify-self:end}
-  /* Outstanding grid: stack on mobile */
-  .cc-out-grid{flex-direction:column;gap:10px}
-  .cc-out-total{margin-left:0}
-  .cc-out-total-val{font-size:16px}
-  /* Head: smaller */
-  .cc-head{padding:10px 14px}
-  .cc-outstanding{padding:10px 14px}
-  .cc-stmts-head{padding:7px 14px}
+  .cc-stmt-date{display:block;font-size:11px;color:var(--w3);margin-bottom:4px}
+  .cc-stmt-amt{display:block;font-size:15px;margin-bottom:4px}
+  .cc-stmt-due{display:block;font-size:11px;margin-bottom:6px}
+  .cc-stmt-paid{display:inline-flex;font-size:12px}
+  .cc-stmt .del-btn{float:right;margin-top:-2px}
   .sal-bar{grid-template-columns:1fr 1fr}
   .sal-bar .sal-cell:last-child{grid-column:1/-1}
+  /* Ensure nothing overflows */
+  body{overflow-x:hidden}
 }
 </style>
 </head>
