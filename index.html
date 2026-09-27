@@ -725,6 +725,7 @@ async function ghGet() {
   const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`;
   const res=await fetch(url,{headers:ghH(token)});
   if(res.status===404){localStorage.removeItem(SHA_K);setStatus('ok','New file');return{transactions:[],subscriptions:[]};}
+  if(res.status===401){throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');}
   if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.message||'GitHub error '+res.status);}
   const meta=await res.json();
   localStorage.setItem(SHA_K,meta.sha);
