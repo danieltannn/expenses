@@ -1,6 +1,17 @@
 {
   "transactions": [
     {
+      "id": "05ae1ff8-56bd-43a3-83a3-7d16a41db668",
+      "description": "Supplement",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 14.89,
+      "date": "2026-09-30",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": true
+    },
+    {
       "id": "404ed6a0-a454-410c-938d-4ce76e957e14",
       "description": "Grab",
       "category": "Transport",
