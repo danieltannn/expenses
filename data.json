@@ -1,6 +1,17 @@
 {
   "transactions": [
     {
+      "id": "9e36f830-0810-4d52-b81e-7895da78b5b9",
+      "description": "Grab",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 25.4,
+      "date": "2026-09-27",
+      "card": "Citi Rewards",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "4a9865d3-9137-4988-830a-2d6d95f641ca",
       "description": "Grab",
       "category": "Transport",
