@@ -4413,6 +4413,16 @@
       "card": "Citi Rewards",
       "notes": null,
       "active": true
+    },
+    {
+      "id": "9688a3b7-3450-4a77-8fc4-1975874eaead",
+      "name": "iCloud",
+      "amount": 3.98,
+      "cycle": "monthly",
+      "nextDate": null,
+      "card": "DBS Debit",
+      "notes": null,
+      "active": true
     }
   ],
   "cards": {
