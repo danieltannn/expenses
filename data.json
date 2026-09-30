@@ -12,6 +12,15 @@
       "pending": true
     },
     {
+      "id": "57f13bfe-f562-475b-8deb-afa6047dc676",
+      "description": "Transport Fee",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 4.21,
+      "date": "2026-09-29",
+      "card": "DBS Debit"
+    },
+    {
       "id": "dbe88ff3-43d4-475d-b2fc-e91ab06227d0",
       "description": "Lunch",
       "category": "Food",
