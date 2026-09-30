@@ -1,6 +1,17 @@
 {
   "transactions": [
     {
+      "id": "01fc3353-f723-4567-aac8-bb935e0f3580",
+      "description": "TorBox",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 3.84,
+      "date": "2026-09-29",
+      "card": "Citi Rewards",
+      "statementd": false,
+      "pending": true
+    },
+    {
       "id": "6f08421e-f332-4d63-89fe-bc401e09c247",
       "description": "Spotify",
       "category": "Subscription",
