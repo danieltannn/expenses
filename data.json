@@ -134,6 +134,17 @@
       "pending": false
     },
     {
+      "id": "750d3a01-c353-4b62-95b9-7a23e85da76f",
+      "description": "Taobao",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 288.61,
+      "date": "2026-09-27",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "9e36f830-0810-4d52-b81e-7895da78b5b9",
       "description": "Grab",
       "category": "Transport",
