@@ -360,6 +360,17 @@
       "pending": false
     },
     {
+      "id": "193333c6-8fcf-48b6-8cd8-bf30a8abaa31",
+      "description": "Gomo",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 19.99,
+      "date": "2026-09-17",
+      "card": "Citi Rewards",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "6bdd7a4a-f209-457d-aca5-576a6d875f5d",
       "description": "iPhone",
       "category": "Lifestyle",
