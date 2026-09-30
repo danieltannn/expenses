@@ -111,6 +111,15 @@
       "pending": false
     },
     {
+      "id": "d752a205-ca57-4573-9785-916440f43e71",
+      "description": "Lunch",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 18.57,
+      "date": "2026-09-24",
+      "card": "DBS Debit"
+    },
+    {
       "id": "f8eac41f-4265-472c-b964-a363b4b1491b",
       "description": "Grab",
       "category": "Transport",
