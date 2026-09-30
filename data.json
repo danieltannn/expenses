@@ -1,6 +1,17 @@
 {
   "transactions": [
     {
+      "id": "6f08421e-f332-4d63-89fe-bc401e09c247",
+      "description": "Spotify",
+      "category": "Subscription",
+      "type": "Expenses",
+      "amount": 16.98,
+      "date": "2026-09-29",
+      "card": "Citi Rewards",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "23f124e6-61f0-4a75-a7cf-3f35c573fcae",
       "description": "Grab",
       "category": "Transport",
