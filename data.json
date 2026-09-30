@@ -4,7 +4,7 @@
       "id": "04b79ad8-0c72-4520-8a5b-075339beffe3",
       "description": "Cashback",
       "category": "Food",
-      "type": "Expenses",
+      "type": "Gain",
       "amount": 0.07,
       "date": "2026-09-30",
       "card": "Trust",
