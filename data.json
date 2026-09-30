@@ -302,6 +302,17 @@
       "pending": false
     },
     {
+      "id": "1d5ed151-4906-4143-8a93-8eb6f761aeb6",
+      "description": "Cashback",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 0.3,
+      "date": "2026-09-22",
+      "card": "Trust",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "a993f6ac-7855-45f2-80be-1db3b8001d95",
       "description": "Grab",
       "category": "Transport",
