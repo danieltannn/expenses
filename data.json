@@ -100,6 +100,15 @@
       "pending": false
     },
     {
+      "id": "1599b900-aee9-4ec5-a3e0-3dd79154ea14",
+      "description": "Grab Foods",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 50,
+      "date": "2026-09-26",
+      "card": "DBS Debit"
+    },
+    {
       "id": "4a825137-b085-4334-8e24-bbe3d6658586",
       "description": "Soya Bean",
       "category": "Food",
