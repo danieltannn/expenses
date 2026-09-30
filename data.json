@@ -946,8 +946,8 @@
       "amount": 0.01,
       "date": "2026-09-08",
       "card": "Trust",
-      "statementd": true,
-      "pending": false
+      "statementd": false,
+      "pending": true
     },
     {
       "id": "2a82bfd1-1177-412e-9e3a-946dccb6ebcb",
