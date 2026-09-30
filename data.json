@@ -12,6 +12,15 @@
       "pending": true
     },
     {
+      "id": "9f286b9a-066b-4f1c-920e-d97819f02263",
+      "description": "Work Equpment",
+      "category": "Necessity",
+      "type": "Expenses",
+      "amount": 5,
+      "date": "2026-09-29",
+      "card": "DBS Debit"
+    },
+    {
       "id": "b2e55a45-45d6-4a3d-b87f-17dd1bb511b8",
       "description": "Work Equipment",
       "category": "Necessity",
