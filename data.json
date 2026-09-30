@@ -4403,6 +4403,16 @@
       "card": "Citi Rewards",
       "notes": null,
       "active": true
+    },
+    {
+      "id": "d6dba1a7-3ae3-4dc4-a9a8-ab8e879e7616",
+      "name": "Spotify",
+      "amount": 16.98,
+      "cycle": "monthly",
+      "nextDate": null,
+      "card": "Citi Rewards",
+      "notes": null,
+      "active": true
     }
   ],
   "cards": {
