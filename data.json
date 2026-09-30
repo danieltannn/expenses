@@ -177,6 +177,15 @@
       "pending": false
     },
     {
+      "id": "7fff759a-928b-4c49-967d-c2c637859aa9",
+      "description": "Transport Fee",
+      "category": "Transport",
+      "type": "Expenses",
+      "amount": 3.85,
+      "date": "2026-09-21",
+      "card": "DBS Debit"
+    },
+    {
       "id": "6b4a6812-9b1a-44b3-bf01-0c4e7b76864e",
       "description": "Citibank Rewards",
       "category": "Card Payment",
