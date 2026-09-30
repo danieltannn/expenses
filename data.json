@@ -100,6 +100,15 @@
       "pending": false
     },
     {
+      "id": "a95023a4-148a-4b2c-870d-8beab58d3690",
+      "description": "Chicken Rice",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 6,
+      "date": "2026-09-25",
+      "card": "DBS Debit"
+    },
+    {
       "id": "4a9865d3-9137-4988-830a-2d6d95f641ca",
       "description": "Grab",
       "category": "Transport",
