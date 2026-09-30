@@ -439,17 +439,6 @@
       "pending": false
     },
     {
-      "id": "4b8344a3-3aa4-438d-950d-a0befa78e017",
-      "description": "Grab",
-      "category": "Transport",
-      "type": "Expenses",
-      "amount": 0.32,
-      "date": "2026-09-19",
-      "card": "Trust",
-      "statementd": false,
-      "pending": false
-    },
-    {
       "id": "0bee434e-d18b-4af5-bb52-2ba11872fd78",
       "description": "Taobao",
       "category": "Lifestyle",
