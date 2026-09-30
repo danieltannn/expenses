@@ -12,6 +12,17 @@
       "pending": true
     },
     {
+      "id": "10b0bf28-3142-4b77-afd4-dd746ee29764",
+      "description": "Conversion Fee",
+      "category": "Lifestyle",
+      "type": "Expenses",
+      "amount": 2.89,
+      "date": "2026-09-29",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "57f13bfe-f562-475b-8deb-afa6047dc676",
       "description": "Transport Fee",
       "category": "Transport",
