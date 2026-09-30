@@ -403,7 +403,7 @@
       "date": "2026-09-20",
       "card": "Trust",
       "statementd": false,
-      "pending": true
+      "pending": false
     },
     {
       "id": "1336fc5b-cef8-4dbd-a517-61cefc1bd100",
@@ -414,7 +414,7 @@
       "date": "2026-09-20",
       "card": "Trust",
       "statementd": false,
-      "pending": true
+      "pending": false
     },
     {
       "id": "0bee434e-d18b-4af5-bb52-2ba11872fd78",
