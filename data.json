@@ -154,6 +154,17 @@
       "card": "DBS Debit"
     },
     {
+      "id": "5bb5692c-a828-4076-a77b-eaca419acde2",
+      "description": "Work Equipment",
+      "category": "Necessity",
+      "type": "Expenses",
+      "amount": 3.63,
+      "date": "2026-09-25",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "4a825137-b085-4334-8e24-bbe3d6658586",
       "description": "Soya Bean",
       "category": "Food",
