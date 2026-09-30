@@ -183,6 +183,17 @@
       "pending": false
     },
     {
+      "id": "6cd50372-8c27-4904-9bb7-2690fc0d5d57",
+      "description": "Work Equipment",
+      "category": "Necessity",
+      "type": "Expenses",
+      "amount": 12.86,
+      "date": "2026-09-24",
+      "card": "HSBC",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "d752a205-ca57-4573-9785-916440f43e71",
       "description": "Lunch",
       "category": "Food",
