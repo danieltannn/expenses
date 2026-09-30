@@ -1356,11 +1356,22 @@ function renderCC() {
 
   el.innerHTML = CC_CARDS.map(cardName => {
     const card     = getCard(cardName);
-    const unstmtd  = txs.filter(t => t.card===cardName && OUT_TYPES.has(t.type) && !t.statementd);
-    const pending  = unstmtd.filter(t => t.pending);
-    const confirmed= unstmtd.filter(t => !t.pending);
-    const pendAmt  = pending.reduce((s,t)=>s+t.amount, 0);
-    const confAmt  = confirmed.reduce((s,t)=>s+t.amount, 0);
+    // All non-statemeneted transactions for this card
+    const unstmtdAll = txs.filter(t => t.card===cardName && !t.statementd);
+    const pendingAll  = unstmtdAll.filter(t => t.pending);
+    const confAll     = unstmtdAll.filter(t => !t.pending);
+
+    // Expenses/installments (charged to card)
+    const pending   = pendingAll.filter(t => OUT_TYPES.has(t.type));
+    const confirmed = confAll.filter(t => OUT_TYPES.has(t.type));
+
+    // Credits that reduce the balance (cashback, refunds — type Gain)
+    const pendCredits = pendingAll.filter(t => !OUT_TYPES.has(t.type));
+    const confCredits = confAll.filter(t => !OUT_TYPES.has(t.type));
+
+    // Net amounts (expenses minus credits)
+    const pendAmt  = pending.reduce((s,t)=>s+t.amount,0)   - pendCredits.reduce((s,t)=>s+t.amount,0);
+    const confAmt  = confirmed.reduce((s,t)=>s+t.amount,0) - confCredits.reduce((s,t)=>s+t.amount,0);
     const totalOwing = pendAmt + confAmt;
     const pts      = (card.points||0).toLocaleString();
     const cn       = esc(cardName);
