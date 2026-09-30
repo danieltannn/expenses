@@ -763,19 +763,41 @@ async function ghGet() {
 async function ghPut(data) {
   const token = getToken();
   if (!token) throw new Error('No token — open ⚙ Settings');
+
+  // Guard: never save empty or corrupted data
+  if (!data || typeof data !== 'object') throw new Error('Save aborted: invalid data');
+  const jsonStr = JSON.stringify(data, null, 2);
+  if (!jsonStr || jsonStr.length < 20) throw new Error('Save aborted: data too small');
+  const content = btoa(unescape(encodeURIComponent(jsonStr)));
+  if (!content) throw new Error('Save aborted: encoding failed');
+
   setStatus('busy','Saving…');
-  const sha  = localStorage.getItem(SHA_K);
-  const body = {
-    message: 'Update data '+new Date().toISOString().slice(0,10),
-    content: btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2)))),
-    branch:  REPO_BRANCH,
-  };
+
+  // Always re-fetch the latest SHA before saving to avoid stale-SHA conflicts
+  let sha = localStorage.getItem(SHA_K);
+  try {
+    const check = await fetch(
+      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`,
+      { headers: ghH(token) }
+    );
+    if (check.ok) {
+      const meta = await check.json();
+      sha = meta.sha;
+      localStorage.setItem(SHA_K, sha);
+    }
+  } catch(_) { /* use cached sha */ }
+
+  const body = { message:'Update data '+new Date().toISOString().slice(0,10), content, branch:REPO_BRANCH };
   if (sha) body.sha = sha;
-  const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json`,
-    {method:'PUT', headers:ghH(token), body:JSON.stringify(body)});
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.message||'Save failed '+res.status);}
-  const r=await res.json();
-  localStorage.setItem(SHA_K,r.content.sha);
+
+  const res = await fetch(
+    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json`,
+    {method:'PUT', headers:ghH(token), body:JSON.stringify(body)}
+  );
+  if (res.status===401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
+  if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.message||'Save failed '+res.status); }
+  const r = await res.json();
+  localStorage.setItem(SHA_K, r.content.sha);
   setStatus('ok','Saved');
 }
 
