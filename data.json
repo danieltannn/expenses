@@ -12,6 +12,15 @@
       "pending": true
     },
     {
+      "id": "b2e55a45-45d6-4a3d-b87f-17dd1bb511b8",
+      "description": "Work Equipment",
+      "category": "Necessity",
+      "type": "Expenses",
+      "amount": 11.5,
+      "date": "2026-09-29",
+      "card": "DBS Debit"
+    },
+    {
       "id": "3ea44f63-d0fd-481c-b0d1-63f20107e436",
       "description": "Grab",
       "category": "Transport",
