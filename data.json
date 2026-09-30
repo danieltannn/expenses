@@ -4433,6 +4433,16 @@
       "card": "DBS Debit",
       "notes": null,
       "active": true
+    },
+    {
+      "id": "5079f8c8-d8f4-402e-b8a7-811c91f995d4",
+      "name": "Claude",
+      "amount": 30.3,
+      "cycle": "monthly",
+      "nextDate": null,
+      "card": "Citi Rewards",
+      "notes": null,
+      "active": true
     }
   ],
   "cards": {
