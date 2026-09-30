@@ -241,7 +241,7 @@
       "id": "d4e84bd9-13c9-42a3-a288-928d53d5b73d",
       "description": "Cashback",
       "category": "Transport",
-      "type": "Expenses",
+      "type": "Gain",
       "amount": 0.02,
       "date": "2026-09-24",
       "card": "Trust",
