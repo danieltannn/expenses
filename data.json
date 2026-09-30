@@ -4383,7 +4383,18 @@
       "pending": false
     }
   ],
-  "subscriptions": [],
+  "subscriptions": [
+    {
+      "id": "9057a286-0bd5-4135-bf55-631ed305ba71",
+      "name": "Gomo",
+      "amount": 19.99,
+      "cycle": "monthly",
+      "nextDate": null,
+      "card": "Citi Rewards",
+      "notes": null,
+      "active": true
+    }
+  ],
   "cards": {
     "Citi Rewards": {
       "points": 0,
