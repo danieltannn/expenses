@@ -177,6 +177,15 @@
       "pending": false
     },
     {
+      "id": "6b4a6812-9b1a-44b3-bf01-0c4e7b76864e",
+      "description": "Citibank Rewards",
+      "category": "Card Payment",
+      "type": "Expenses",
+      "amount": 1483.45,
+      "date": "2026-09-21",
+      "card": "DBS Debit"
+    },
+    {
       "id": "3bafd2fa-d487-4acd-9e18-2b28156d64d6",
       "description": "UOB Flight",
       "category": "Travel",
