@@ -12,6 +12,15 @@
       "pending": true
     },
     {
+      "id": "dbe88ff3-43d4-475d-b2fc-e91ab06227d0",
+      "description": "Lunch",
+      "category": "Food",
+      "type": "Expenses",
+      "amount": 13,
+      "date": "2026-09-29",
+      "card": "DBS Debit"
+    },
+    {
       "id": "fdbe1555-461d-4d9e-9cab-3aa14fed796f",
       "description": "Work Equipment",
       "category": "Necessity",
