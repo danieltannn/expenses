@@ -749,15 +749,32 @@ async function ghGet() {
   const token = getToken();
   if (!token) throw new Error('No token set — open ⚙ Settings and enter your PAT');
   setStatus('busy','Loading…');
-  const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`;
-  const res=await fetch(url,{headers:ghH(token)});
-  if(res.status===404){localStorage.removeItem(SHA_K);setStatus('ok','New file');return{transactions:[],subscriptions:[]};}
-  if(res.status===401){throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');}
-  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.message||'GitHub error '+res.status);}
-  const meta=await res.json();
-  localStorage.setItem(SHA_K,meta.sha);
+
+  // Fetch raw JSON directly — much faster than Contents API (no base64 overhead)
+  const rawUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}/data.json`;
+  const rawRes = await fetch(rawUrl + '?t=' + Date.now(), {
+    headers: { 'Authorization': `Bearer ${token}`, 'Cache-Control': 'no-cache' }
+  });
+  if (rawRes.status === 404) {
+    // New file — also clear SHA
+    localStorage.removeItem(SHA_K);
+    setStatus('ok','New file');
+    return { transactions:[], subscriptions:[], cards:{} };
+  }
+  if (rawRes.status === 401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
+  if (!rawRes.ok) throw new Error('Load failed ' + rawRes.status);
+  const data = await rawRes.json();
+
+  // Fetch SHA separately (lightweight — needed for future saves)
+  // Do this in background so it doesn't block loading
+  fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`,
+    { headers: ghH(token) })
+    .then(r => r.ok ? r.json() : null)
+    .then(meta => { if (meta?.sha) localStorage.setItem(SHA_K, meta.sha); })
+    .catch(() => {});
+
   setStatus('ok','Synced');
-  return JSON.parse(atob(meta.content.replace(/\s/g,'')));
+  return data;
 }
 
 async function ghPut(data) {
@@ -773,28 +790,29 @@ async function ghPut(data) {
 
   setStatus('busy','Saving…');
 
-  // Always re-fetch the latest SHA before saving to avoid stale-SHA conflicts
+  const doSave = async (sha) => {
+    const body = { message:'Update data '+new Date().toISOString().slice(0,10), content, branch:REPO_BRANCH };
+    if (sha) body.sha = sha;
+    return fetch(
+      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json`,
+      { method:'PUT', headers:ghH(token), body:JSON.stringify(body) }
+    );
+  };
+
   let sha = localStorage.getItem(SHA_K);
-  try {
+  let res = await doSave(sha);
+
+  // If SHA conflict (409), re-fetch SHA once and retry
+  if (res.status === 409) {
     const check = await fetch(
       `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`,
       { headers: ghH(token) }
     );
-    if (check.ok) {
-      const meta = await check.json();
-      sha = meta.sha;
-      localStorage.setItem(SHA_K, sha);
-    }
-  } catch(_) { /* use cached sha */ }
+    if (check.ok) { sha = (await check.json()).sha; localStorage.setItem(SHA_K, sha); }
+    res = await doSave(sha);
+  }
 
-  const body = { message:'Update data '+new Date().toISOString().slice(0,10), content, branch:REPO_BRANCH };
-  if (sha) body.sha = sha;
-
-  const res = await fetch(
-    `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json`,
-    {method:'PUT', headers:ghH(token), body:JSON.stringify(body)}
-  );
-  if (res.status===401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
+  if (res.status === 401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
   if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.message||'Save failed '+res.status); }
   const r = await res.json();
   localStorage.setItem(SHA_K, r.content.sha);
@@ -809,7 +827,7 @@ async function load() {
     txs   = (data.transactions  ||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
     subs  = (data.subscriptions ||[]).slice();
     cards = data.cards || {};
-    render();
+    _doRender();
   } catch(e) {
     setStatus('err','Error');
     document.getElementById('tblWrap').innerHTML=`<div class="empty"><div class="empty-ico">✕</div><p>${esc(e.message)}</p></div>`;
@@ -892,7 +910,12 @@ function mfClear(key) {
 }
 
 // ═══ Filters / Sort ════════════════════════════════════════════
+let _renderTimer = null;
 function render() {
+  clearTimeout(_renderTimer);
+  _renderTimer = setTimeout(_doRender, 30);
+}
+function _doRender() {
   const dateFrom = (document.getElementById('dateFrom')||{}).value || '';
   const dateTo   = (document.getElementById('dateTo')  ||{}).value || '';
   const { cats, cards, types, statuses } = filterState;
@@ -1626,7 +1649,7 @@ async function saveTx() {
   const isEditSalary = !!id && t.category === 'Salary';
   if(id){const i=txs.findIndex(x=>x.id===id);if(i>=0)txs[i]=t;else txs.unshift(t);}else txs.unshift(t);
   txs.sort((a,b)=>b.date.localeCompare(a.date));
-  closeModal('mAdd'); render();
+  closeModal('mAdd'); _doRender();
   if (isNewSalary || isEditSalary) {
     toast(isNewSalary ? 'Salary added' : 'Salary updated');
     if (viewMode !== 'chart') setTimeout(() => setView('chart'), 80);
@@ -1636,7 +1659,7 @@ async function saveTx() {
 async function deleteTx(id) {
   if(!confirm('Delete this transaction?')) return;
   const wasSalary = txs.find(t=>t.id===id)?.category === 'Salary';
-  txs=txs.filter(t=>t.id!==id); render();
+  txs=txs.filter(t=>t.id!==id); _doRender();
   if (wasSalary) {
     toast('Pay period removed');
     if (viewMode !== 'chart') setTimeout(() => setView('chart'), 80);
@@ -1649,7 +1672,7 @@ async function cycleBadge(id) {
   if(t.pending)         { t.pending=false; t.statementd=false; }  // Pending → Confirmed
   else if(!t.statementd){ t.statementd=true; }                    // Confirmed → Statemeneted
   else                  { t.pending=true; t.statementd=false; }   // Statemeneted → Pending
-  render(); try{await save();}catch(_){}
+  _doRender(); try{await save();}catch(_){}
 }
 
 // ── Subscription CRUD ──
