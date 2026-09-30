@@ -4423,6 +4423,16 @@
       "card": "DBS Debit",
       "notes": null,
       "active": true
+    },
+    {
+      "id": "1a8f2a23-34a8-457d-a9ad-7cf0fe894df3",
+      "name": "AIA Insurance",
+      "amount": 2233.14,
+      "cycle": "monthly",
+      "nextDate": null,
+      "card": "DBS Debit",
+      "notes": null,
+      "active": true
     }
   ],
   "cards": {
