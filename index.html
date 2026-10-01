@@ -652,8 +652,8 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
       <button class="modal-close" onclick="closeModal('mSettings')">×</button>
     </div>
     <div class="modal-body">
-      <div class="note">Token stored in localStorage only. Use a fine-grained PAT with <strong>Contents: read &amp; write</strong> on the <strong>${REPO_OWNER}/${REPO_NAME}</strong> repo.</div>
-      <div style="padding:8px 0;font-size:12px;color:var(--w3)">Repo: <span style="color:var(--w2);font-family:var(--mono)">${REPO_OWNER}/${REPO_NAME}</span> &nbsp;·&nbsp; Branch: <span style="color:var(--w2);font-family:var(--mono)">${REPO_BRANCH}</span></div>
+      <div class="note">Token stored in localStorage only. Use a fine-grained PAT with <strong>Contents: read &amp; write</strong> on the <strong>danieltannn/expenses</strong> repo.</div>
+      <div style="padding:8px 0;font-size:12px;color:var(--w3)">Repo: <span style="color:var(--w2);font-family:var(--mono)">danieltannn/expenses</span> &nbsp;·&nbsp; Branch: <span style="color:var(--w2);font-family:var(--mono)">main</span></div>
       <div class="fg"><label>Personal Access Token</label><input type="password" id="cToken" placeholder="ghp_…"></div>
       <div class="form-acts">
         <button class="btn" onclick="closeModal('mSettings')">Cancel</button>
@@ -750,23 +750,19 @@ async function ghGet() {
   if (!token) throw new Error('No token set — open ⚙ Settings and enter your PAT');
   setStatus('busy','Loading…');
 
-  // Fetch raw JSON directly — much faster than Contents API (no base64 overhead)
+  // Raw URL: public repo, no auth header needed (avoids CORS preflight failure)
   const rawUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}/data.json`;
-  const rawRes = await fetch(rawUrl + '?t=' + Date.now(), {
-    headers: { 'Authorization': `Bearer ${token}`, 'Cache-Control': 'no-cache' }
-  });
+  const rawRes = await fetch(rawUrl + '?t=' + Date.now(), { cache: 'no-store' });
+
   if (rawRes.status === 404) {
-    // New file — also clear SHA
     localStorage.removeItem(SHA_K);
     setStatus('ok','New file');
     return { transactions:[], subscriptions:[], cards:{} };
   }
-  if (rawRes.status === 401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
   if (!rawRes.ok) throw new Error('Load failed ' + rawRes.status);
   const data = await rawRes.json();
 
-  // Fetch SHA separately (lightweight — needed for future saves)
-  // Do this in background so it doesn't block loading
+  // Fetch SHA in background (Contents API supports CORS with auth, needed for saves)
   fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`,
     { headers: ghH(token) })
     .then(r => r.ok ? r.json() : null)
@@ -855,9 +851,10 @@ function setView(mode) {
   // FAB: hide on CC view (has its own add-statement buttons)
   document.getElementById('fabBtn').style.display = mode==='cc' ? 'none' : '';
 
-  if (mode==='chart') { chartDrillCat=null; renderChart(); }
-  if (mode==='subs')  renderSubs();
-  if (mode==='cc')    renderCC();
+  if      (mode==='table') renderTable();
+  else if (mode==='chart') { chartDrillCat=null; renderChart(); }
+  else if (mode==='subs')  renderSubs();
+  else if (mode==='cc')    renderCC();
   renderCatSpending();
   renderTotals();
   renderMeta();
@@ -944,11 +941,12 @@ function _doRender() {
   renderCatSpending();
   renderTotals();
   renderMeta();
-  if (viewMode==='table') renderTable();
+  if      (viewMode==='table') renderTable();
   else if (viewMode==='chart') renderChart();
-  else renderSubs();
+  else if (viewMode==='subs')  renderSubs();
+  // CC view: doesn't respond to filter changes, re-rendered only when data changes
 }
-function toggleSort(k) { if(sortK===k) sortD*=-1; else{sortK=k;sortD=-1;} render(); }
+function toggleSort(k) { if(sortK===k) sortD*=-1; else{sortK=k;sortD=-1;} _doRender(); }
 function resetFilters() {
   const df=document.getElementById('dateFrom'); if(df) df.value='';
   const dt=document.getElementById('dateTo');   if(dt) dt.value='';
