@@ -745,14 +745,16 @@ function toast(msg, kind='ok') {
 // ═══ GitHub API ════════════════════════════════════════════════
 function ghH(t) { return {'Authorization':'Bearer '+t,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'}; }
 
-async function ghGet() {
+async function ghGet(forceRefresh = false) {
   const token = getToken();
   if (!token) throw new Error('No token set — open ⚙ Settings and enter your PAT');
   setStatus('busy','Loading…');
 
-  // Raw URL: public repo, no auth header needed (avoids CORS preflight failure)
-  const rawUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}/data.json`;
-  const rawRes = await fetch(rawUrl + '?t=' + Date.now(), { cache: 'no-store' });
+  // Raw URL (public repo, no auth = no CORS preflight).
+  // Only bypass CDN cache on manual Sync (forceRefresh = true).
+  const rawUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${REPO_BRANCH}/data.json`
+    + (forceRefresh ? '?t=' + Date.now() : '');
+  const rawRes = await fetch(rawUrl, { cache: forceRefresh ? 'no-store' : 'default' });
 
   if (rawRes.status === 404) {
     localStorage.removeItem(SHA_K);
@@ -762,11 +764,15 @@ async function ghGet() {
   if (!rawRes.ok) throw new Error('Load failed ' + rawRes.status);
   const data = await rawRes.json();
 
-  // Fetch SHA in background (Contents API supports CORS with auth, needed for saves)
-  fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`,
+  // Get SHA in background using the lightweight git trees API
+  // (returns only file names + SHAs, no file content — tiny response)
+  fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/git/trees/${REPO_BRANCH}`,
     { headers: ghH(token) })
     .then(r => r.ok ? r.json() : null)
-    .then(meta => { if (meta?.sha) localStorage.setItem(SHA_K, meta.sha); })
+    .then(tree => {
+      const entry = tree?.tree?.find(e => e.path === 'data.json');
+      if (entry?.sha) localStorage.setItem(SHA_K, entry.sha);
+    })
     .catch(() => {});
 
   setStatus('ok','Synced');
@@ -834,7 +840,19 @@ async function save() {
   try { await ghPut({transactions:txs, subscriptions:subs, cards}); toast('Saved'); }
   catch(e) { setStatus('err','Failed'); toast(e.message,'bad'); throw e; }
 }
-function manualSync() { load().then(()=>toast('Synced')).catch(e=>toast(e.message,'bad')); }
+function manualSync() {
+  (async () => {
+    try {
+      setStatus('busy','Syncing…');
+      const data = await ghGet(true); // force-refresh past CDN
+      txs   = (data.transactions  ||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+      subs  = (data.subscriptions ||[]).slice();
+      cards = data.cards || {};
+      _doRender();
+      toast('Synced');
+    } catch(e) { setStatus('err','Error'); toast(e.message,'bad'); }
+  })();
+}
 
 // ═══ View ══════════════════════════════════════════════════════
 function setView(mode) {
