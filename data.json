@@ -245,7 +245,7 @@
       "amount": 12.86,
       "date": "2026-09-24",
       "card": "HSBC",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
@@ -554,7 +554,7 @@
       "amount": 1899,
       "date": "2026-09-17",
       "card": "HSBC",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
@@ -775,7 +775,7 @@
       "amount": 23.8,
       "date": "2026-09-12",
       "card": "HSBC",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
@@ -1209,7 +1209,7 @@
       "amount": 750,
       "date": "2026-09-01",
       "card": "HSBC",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
