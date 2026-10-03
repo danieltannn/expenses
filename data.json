@@ -1209,7 +1209,7 @@
       "amount": 750,
       "date": "2026-09-01",
       "card": "HSBC",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
