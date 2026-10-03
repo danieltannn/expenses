@@ -313,6 +313,9 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 .cc-stmt-paid{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;transition:opacity .15s;user-select:none}
 .cc-stmt-paid:hover{opacity:.7}
 .cc-no-stmt{padding:14px 18px;font-size:12px;color:var(--w3)}
+.cc-show-paid{padding:8px 18px;font-size:11px;color:var(--w3);cursor:pointer;border-top:1px solid var(--b1);transition:color .15s;user-select:none}
+.cc-show-paid:hover{color:var(--w1)}
+.cc-stmts-head{cursor:pointer}
 
 /* ── Mobile ── */
 @media(max-width:700px){
@@ -826,6 +829,7 @@ async function load() {
     txs   = (data.transactions  ||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
     subs  = (data.subscriptions ||[]).slice();
     cards = data.cards || {};
+    _ccInited = false; ccStmtOpen.clear(); ccShowPaid.clear(); // re-init CC state
     _doRender();
   } catch(e) {
     setStatus('err','Error');
@@ -1376,6 +1380,32 @@ function renderCategoryDrill(el, cat, period) {
 }
 
 // ═══ Credit Cards view ═════════════════════════════════════════
+// Statement section state (persists across re-renders)
+const ccStmtOpen = new Set(); // which cards have stmts expanded
+const ccShowPaid = new Set(); // which cards show paid stmts too
+let   _ccInited  = false;     // reset to false after each data load
+
+function initCCStmt() {
+  if (_ccInited) return;
+  _ccInited = true;
+  // Auto-open cards that have unpaid statements
+  [...CC].forEach(name => {
+    const stmts = (cards[name]?.statements) || [];
+    if (stmts.some(s => !s.paid)) ccStmtOpen.add(name);
+  });
+}
+
+function toggleCCStmt(cardName) {
+  if (ccStmtOpen.has(cardName)) ccStmtOpen.delete(cardName);
+  else ccStmtOpen.add(cardName);
+  renderCC();
+}
+function toggleCCPaid(cardName) {
+  if (ccShowPaid.has(cardName)) ccShowPaid.delete(cardName);
+  else ccShowPaid.add(cardName);
+  renderCC();
+}
+
 function getCard(name) {
   if (!cards[name]) cards[name] = { points:0, statements:[] };
   if (!cards[name].statements) cards[name].statements = [];
@@ -1431,23 +1461,50 @@ function renderCC() {
       ? `<div class="cc-out-grid">${outCells.join('')}<div class="cc-out-total"><div class="cc-out-total-lbl">Total owing</div><div class="cc-out-total-val">${fmt(totalOwing)}</div></div></div>`
       : `<div style="font-size:12px;color:var(--w3)">Nothing outstanding — all transactions are statemeneted.</div>`;
 
-    // Statements
-    const stmts = (card.statements||[]).slice().sort((a,b) => (b.statementDate||'').localeCompare(a.statementDate||''));
-    const stmtRows = stmts.map(s => {
-      const sid  = esc(s.id);
-      const due  = dueLblCC(s.dueDate, s.paid);
+    // Statements — collapsible, shows only unpaid by default
+    initCCStmt();
+    const stmts    = (card.statements||[]).slice().sort((a,b) => (b.statementDate||'').localeCompare(a.statementDate||''));
+    const unpaid   = stmts.filter(s => !s.paid);
+    const paid     = stmts.filter(s =>  s.paid);
+    const isOpen   = ccStmtOpen.has(cardName);
+    const showPaid = ccShowPaid.has(cardName);
+
+    const makeStmtRow = s => {
+      const sid = esc(s.id);
+      const due = dueLblCC(s.dueDate, s.paid);
       return `<div class="cc-stmt">
         <span class="cc-stmt-date">${fmtDay(s.statementDate)}</span>
         <span class="cc-stmt-amt">${fmt(s.amount)}</span>
         <span class="cc-stmt-due ${due.cls}">${due.text}</span>
         <span class="cc-stmt-paid" onclick="togglePaid('${cn}','${sid}')">
-          ${s.paid
-            ? '<span style="color:#4ade80">● Paid</span>'
-            : '<span style="color:var(--w3)">○ Unpaid</span>'}
+          ${s.paid ? '<span style="color:#4ade80">● Paid</span>' : '<span style="color:var(--w3)">○ Unpaid</span>'}
         </span>
         <button class="del-btn" onclick="deleteStatement('${cn}','${sid}')">×</button>
       </div>`;
-    }).join('') || `<div class="cc-no-stmt">No statements yet — click + Add to record one.</div>`;
+    };
+
+    let stmtBody = '';
+    if (isOpen) {
+      if (!stmts.length) {
+        stmtBody = `<div class="cc-no-stmt">No statements yet — click + Add.</div>`;
+      } else {
+        stmtBody += unpaid.length
+          ? unpaid.map(makeStmtRow).join('')
+          : `<div class="cc-no-stmt">No open statements — all paid.</div>`;
+        if (paid.length) {
+          stmtBody += `<div class="cc-show-paid" onclick="toggleCCPaid('${cn}')">
+            ${showPaid
+              ? '▾ Hide paid statements'
+              : `▸ ${paid.length} paid statement${paid.length>1?'s':''}`}
+          </div>`;
+          if (showPaid) stmtBody += paid.map(makeStmtRow).join('');
+        }
+      }
+    }
+
+    const badge = unpaid.length
+      ? `<span style="color:#f59e0b;margin-left:6px;font-weight:700">${unpaid.length} open</span>`
+      : (stmts.length ? `<span style="color:#4ade80;margin-left:6px">all paid</span>` : '');
 
     return `<div class="cc-section">
       <div class="cc-head">
@@ -1462,11 +1519,11 @@ function renderCC() {
         <div class="cc-out-lbl">Outstanding (not statemeneted)</div>
         ${outSection}
       </div>
-      <div class="cc-stmts-head">
-        <span class="cc-stmts-lbl">Statements</span>
-        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="openAddStatement('${cn}')">+ Add</button>
+      <div class="cc-stmts-head" onclick="toggleCCStmt('${cn}')">
+        <span class="cc-stmts-lbl">${isOpen ? '▾' : '▸'} Statements${badge}</span>
+        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();openAddStatement('${cn}')">+ Add</button>
       </div>
-      ${stmtRows}
+      ${stmtBody}
     </div>`;
   }).join('');
 }
