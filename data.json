@@ -8,7 +8,7 @@
       "amount": 14.89,
       "date": "2026-09-30",
       "card": "HSBC",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
