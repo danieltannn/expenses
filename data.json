@@ -4636,7 +4636,15 @@
     },
     "HSBC": {
       "points": 0,
-      "statements": []
+      "statements": [
+        {
+          "id": "fc0e9de0-d4d1-4069-a40a-db31e772453e",
+          "amount": 2980.79,
+          "statementDate": "2026-10-01",
+          "dueDate": "2026-10-21",
+          "paid": true
+        }
+      ]
     },
     "Trust": {
       "points": 0,
