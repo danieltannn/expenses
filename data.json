@@ -1,6 +1,17 @@
 {
   "transactions": [
     {
+      "id": "17bc5b0e-bba9-4527-9db8-b9469c2c682f",
+      "description": "Japan Airbnb",
+      "category": "Travel",
+      "type": "Expenses",
+      "amount": 1816.15,
+      "date": "2026-10-30",
+      "card": "UOB Ladys",
+      "statementd": false,
+      "pending": false
+    },
+    {
       "id": "05ae1ff8-56bd-43a3-83a3-7d16a41db668",
       "description": "Supplement",
       "category": "Lifestyle",
