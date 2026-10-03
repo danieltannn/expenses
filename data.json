@@ -1399,7 +1399,7 @@
       "amount": 2.5,
       "date": "2026-08-23",
       "card": "HSBC",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
