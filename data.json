@@ -9,7 +9,7 @@
       "date": "2026-09-30",
       "card": "HSBC",
       "statementd": false,
-      "pending": false
+      "pending": true
     },
     {
       "id": "404ed6a0-a454-410c-938d-4ce76e957e14",
@@ -163,7 +163,7 @@
       "amount": 288.61,
       "date": "2026-09-27",
       "card": "HSBC",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
@@ -194,7 +194,7 @@
       "amount": 3.63,
       "date": "2026-09-25",
       "card": "HSBC",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
@@ -1399,7 +1399,7 @@
       "amount": 2.5,
       "date": "2026-08-23",
       "card": "HSBC",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
@@ -1410,7 +1410,7 @@
       "amount": 65.4,
       "date": "2026-08-23",
       "card": "HSBC",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
@@ -1430,7 +1430,7 @@
       "amount": 10.1,
       "date": "2026-08-22",
       "card": "HSBC",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
@@ -1488,7 +1488,7 @@
       "amount": 24,
       "date": "2026-08-21",
       "card": "HSBC",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
@@ -1526,7 +1526,7 @@
       "amount": 26.4,
       "date": "2026-08-20",
       "card": "HSBC",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
@@ -2025,7 +2025,7 @@
       "amount": 21.55,
       "date": "2026-08-02",
       "card": "HSBC",
-      "statementd": true,
+      "statementd": false,
       "pending": false
     },
     {
