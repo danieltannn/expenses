@@ -782,10 +782,17 @@ async function ghPut(data) {
 
   // Guard: never save empty or corrupted data
   if (!data || typeof data !== 'object') throw new Error('Save aborted: invalid data');
-  const jsonStr = JSON.stringify(data, null, 2);
+  const jsonStr = JSON.stringify(data);  // compact — no indent, smaller + faster
   if (!jsonStr || jsonStr.length < 20) throw new Error('Save aborted: data too small');
-  const content = btoa(unescape(encodeURIComponent(jsonStr)));
-  if (!content) throw new Error('Save aborted: encoding failed');
+
+  // TextEncoder + chunked binary: reliable on iOS Safari for large strings
+  // (btoa(unescape(encodeURIComponent())) can silently truncate on mobile)
+  const utf8   = new TextEncoder().encode(jsonStr);
+  let   binary = '';
+  for (let i = 0; i < utf8.length; i += 4096)
+    binary += String.fromCharCode(...utf8.subarray(i, i + 4096));
+  const content = btoa(binary);
+  if (!content || content.length < 20) throw new Error('Save aborted: encoding failed');
 
   setStatus('busy','Saving…');
 
@@ -814,6 +821,9 @@ async function ghPut(data) {
   if (res.status === 401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
   if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.message||'Save failed '+res.status); }
   const r = await res.json();
+  if (!r.content?.size || r.content.size < 100) {
+    throw new Error('GitHub stored corrupt file — please sync to restore and try again');
+  }
   localStorage.setItem(SHA_K, r.content.sha);
   setStatus('ok','Saved');
 }
