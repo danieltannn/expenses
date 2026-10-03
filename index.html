@@ -466,9 +466,6 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
     </div>
   </div>
 
-  <!-- Totals bar — shows filtered view totals -->
-  <div class="totals-bar" id="totalsBar" style="display:none"></div>
-
   <!-- View bar -->
   <div class="view-bar">
     <span class="meta" id="metaCount"></span>
@@ -863,7 +860,6 @@ function setView(mode) {
   else if (mode==='subs')  renderSubs();
   else if (mode==='cc')    renderCC();
   renderCatSpending();
-  renderTotals();
   renderMeta();
 }
 
@@ -946,7 +942,6 @@ function _doRender() {
   view.sort((a,b) => sortK==='amount' ? sortD*(a.amount-b.amount) : sortD*String(a[sortK]).localeCompare(String(b[sortK])));
 
   renderCatSpending();
-  renderTotals();
   renderMeta();
   if      (viewMode==='table') renderTable();
   else if (viewMode==='chart') renderChart();
@@ -1001,38 +996,6 @@ function renderCatSpending() {
     <div class="cat-chips">${chips}</div>`;
 }
 
-// ═══ Totals bar (filtered view) ════════════════════════════════
-function renderTotals() {
-  const el = document.getElementById('totalsBar');
-  if (!el) return;
-  // Only show on the Transactions tab
-  if (viewMode !== 'table') { el.style.display='none'; return; }
-  el.style.display='';
-
-  let out=0,oc=0,inc=0,ic=0;
-  view.forEach(t=>{
-    if(OUT_TYPES.has(t.type)){out+=t.amount;oc++;}
-    else{inc+=t.amount;ic++;}
-  });
-  const net=inc-out;
-
-  el.innerHTML=`
-    <div class="tc">
-      <div class="tc-lbl">Money Out</div>
-      <div class="tc-val" style="color:#f43f5e">− ${fmt(out)}</div>
-      <div class="tc-sub">${oc} transaction${oc!==1?'s':''}</div>
-    </div>
-    <div class="tc">
-      <div class="tc-lbl">Money In</div>
-      <div class="tc-val" style="color:#4ade80">+ ${fmt(inc)}</div>
-      <div class="tc-sub">${ic} transaction${ic!==1?'s':''}</div>
-    </div>
-    <div class="tc">
-      <div class="tc-lbl">Net</div>
-      <div class="tc-val" style="color:${net>=0?'#4ade80':'#f43f5e'}">${net>=0?'+':'−'} ${fmt(Math.abs(net))}</div>
-      <div class="tc-sub">${view.length} of ${txs.length} shown</div>
-    </div>`;
-}
 
 function renderMeta() {
   const txt = viewMode==='table'
