@@ -1488,7 +1488,7 @@
       "amount": 24,
       "date": "2026-08-21",
       "card": "HSBC",
-      "statementd": false,
+      "statementd": true,
       "pending": false
     },
     {
