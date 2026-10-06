@@ -2,7 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ledger">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Ledger</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,6 +71,24 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 .mf-clr:hover{color:var(--w1)}
 .fi-reset{background:none;border:none;color:var(--w3);font-size:13px;cursor:pointer;padding:4px 8px;font-family:var(--font);transition:color .15s;flex-shrink:0;height:30px}
 .fi-reset:hover{color:var(--w1)}
+.sheet-only{display:none}
+.mf-opt{text-transform:none;letter-spacing:0;font-weight:400}
+.date-rng{display:contents}
+.flt-btn,.flt-backdrop{display:none}
+.btn-del{margin-right:auto;color:#f43f5e;border-color:rgba(244,63,94,.35)}
+.btn-del:hover{border-color:#f43f5e;color:#f43f5e}
+.hdr-btn{gap:6px}
+.mo-sep{display:flex;justify-content:space-between;align-items:center}
+.mo-tot{font-family:var(--mono);font-weight:500;letter-spacing:0;text-transform:none}
+.tx-row{padding:10px 14px;border-bottom:1px solid var(--b1);cursor:pointer}
+.tx-row:active{background:var(--s2)}
+.txr-l1{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.txr-desc{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.txr-amt{font-family:var(--mono);font-size:14px;font-weight:600;white-space:nowrap}
+.txr-amt.out{color:#f43f5e}.txr-amt.in{color:#4ade80}
+.txr-l2{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:11px;color:var(--w3);white-space:nowrap;overflow:hidden}
+.txr-l2 i{font-style:normal;opacity:.5}
+.txr-l2 .badge{margin-left:auto;font-size:10px;padding:1px 6px}
 /* Per-card tabs */
 .card-tabs{display:flex;margin:-8px -12px 8px;border-bottom:1px solid var(--b1);overflow-x:auto;scrollbar-width:none}
 .card-tabs::-webkit-scrollbar{display:none}
@@ -335,17 +361,48 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   /* iOS zooms into any field under 16px — keep every input at 16px on phones */
   input,select,textarea,.fi,.date-fi,.cc-pts-input{font-size:16px !important}
   .date-fi{flex:1 1 130px;width:auto;min-width:0;height:36px}
-  .wrap{padding:10px 10px 80px}
+  .wrap{padding:10px 10px calc(150px + env(safe-area-inset-bottom))}
+  /* 2. Compact header + 11. safe area */
+  .hdr{height:auto;min-height:52px;padding:env(safe-area-inset-top) 14px 0;gap:8px}
+  .hb-lbl,#syncLbl{display:none}
+  .hdr-btn{width:38px;height:34px;padding:0;justify-content:center;font-size:16px}
+  /* 3. Filters collapse into a bottom sheet */
+  .card-tabs{margin-bottom:-8px}
+  .view-bar{flex-direction:row;align-items:center;justify-content:space-between}
+  body[data-view="table"] .flt-btn{display:inline-flex}
+  .flt-btn{align-items:center;gap:6px;background:none;border:1px solid var(--b2);color:var(--w2);font-size:12px;font-family:var(--font);padding:6px 12px;cursor:pointer}
+  .flt-n{background:var(--w1);color:var(--bg);font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px}
+  .f-drops{display:none}
+  body.show-filters .flt-backdrop{display:block;position:fixed;inset:0;z-index:205;background:rgba(0,0,0,.7)}
+  body.show-filters .f-drops{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:210;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:10px;
+    max-height:85dvh;overflow-y:auto;background:var(--s1);border-top:1px solid var(--b2);padding:14px 16px calc(16px + env(safe-area-inset-bottom))}
+  .sheet-only{display:block}
+  .sheet-head{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .sheet-done{background:var(--w1);color:var(--bg);border:none;font-family:var(--font);font-weight:600;font-size:13px;padding:7px 16px;cursor:pointer}
+  .date-rng{display:flex;flex-direction:column;gap:4px}
+  .date-sep{display:none}
+  .f-drops .date-fi{flex:none;width:100%;height:42px}
+  .mf-wrap{width:100%}
+  .mf-btn{width:100%;height:42px;justify-content:space-between;font-size:14px}
+  .mf-panel{position:static;margin-top:4px;box-shadow:none;width:100%}
+  .mf-opt{padding:11px 12px;font-size:14px}
+  .f-drops .fi-reset{height:42px;border:1px solid var(--b2);font-size:13px}
+  /* 9. Sticky Save/Cancel */
+  .modal .form-acts{position:sticky;bottom:-20px;z-index:2;background:var(--s1);margin:4px -20px -20px;padding:10px 20px calc(12px + env(safe-area-inset-bottom))}
+  .modal .form-acts .btn{flex:1;justify-content:center;padding:12px 8px;font-size:14px}
+  .modal .form-acts .btn-del{flex:0 0 auto;margin-right:0}
   .subs-summary{grid-template-columns:1fr 1fr}
   .subs-summary .ss-cell:last-child{grid-column:1/-1}
   /* Filters: wrap to 2 cols on mobile */
-  .f-drops{flex-wrap:wrap}
   .card-tab{flex:none;padding:10px 12px}
-  .f-drops .fi{min-width:calc(50% - 3px);flex:none}
   /* View bar: stack tabs below meta */
-  .main-tabs{gap:3px;padding:3px;margin-bottom:10px}
-  .mtab{flex-direction:column;gap:3px;padding:8px 2px;font-size:11px}
-  .mt-ico{font-size:15px}
+  /* 1. Bottom tab bar */
+  .main-tabs{position:fixed;left:0;right:0;bottom:0;z-index:85;margin:0;gap:0;padding:6px 6px calc(6px + env(safe-area-inset-bottom));
+    border:none;border-top:1px solid var(--b1);background:rgba(10,10,10,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+  .mtab{flex-direction:column;gap:3px;padding:6px 2px;font-size:10px;color:var(--w3)}
+  .mtab:hover{background:none}
+  .mtab.on{background:none;color:var(--w1)}
+  .mt-ico{font-size:19px;opacity:.55}
   .mt-full{display:none}
   .mt-short{display:inline}
   /* Switch to card layout */
@@ -361,7 +418,8 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   /* Subscriptions */
   .col-meq{display:none}
   /* FAB bigger tap target */
-  .fab{bottom:16px;right:16px;width:52px;height:52px}
+  .fab{bottom:calc(78px + env(safe-area-inset-bottom));right:16px;width:52px;height:52px}
+  .toast{bottom:calc(142px + env(safe-area-inset-bottom));right:16px;left:16px;max-width:none}
   /* ── Credit Cards mobile ── */
   .cc-wrap{overflow-x:hidden}
   .cc-section{overflow-x:hidden}
@@ -389,14 +447,14 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 }
 </style>
 </head>
-<body>
+<body data-view="table">
 
 <header class="hdr">
   <div class="hdr-logo"><div class="logo-mark">L</div>LEDGER</div>
   <div class="hdr-spacer"></div>
   <div class="sync-wrap"><div class="dot" id="dot"></div><span id="syncLbl">—</span></div>
-  <button class="btn" onclick="manualSync()">↻ Sync</button>
-  <button class="btn" onclick="openSettings()">⚙ Settings</button>
+  <button class="btn hdr-btn" onclick="manualSync()" title="Sync"><span>↻</span><span class="hb-lbl">Sync</span></button>
+  <button class="btn hdr-btn" onclick="openSettings()" title="Settings"><span>⚙</span><span class="hb-lbl">Settings</span></button>
 </header>
 
 <div class="wrap">
@@ -412,11 +470,12 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   <!-- Filters (table-only) -->
   <div class="filters" id="filtersBar">
     <div class="card-tabs" id="cardTabs"></div>
-    <div class="f-drops">
+    <div class="f-drops" id="fDrops">
+      <div class="sheet-head sheet-only"><span>Filters</span><button class="sheet-done" onclick="closeFilters()">Done</button></div>
       <!-- Date range -->
-      <input class="date-fi" type="date" id="dateFrom" onchange="render()" title="From date">
+      <div class="date-rng"><label class="sheet-only">From</label><input class="date-fi" type="date" id="dateFrom" onchange="render()" title="From date"></div>
       <span class="date-sep">→</span>
-      <input class="date-fi" type="date" id="dateTo"   onchange="render()" title="To date">
+      <div class="date-rng"><label class="sheet-only">To</label><input class="date-fi" type="date" id="dateTo" onchange="render()" title="To date"></div>
 
       <!-- Category -->
       <div class="mf-wrap">
@@ -472,7 +531,8 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
     </div>
   </div>
 
-  <div class="view-bar"><span class="meta" id="metaCount"></span></div>
+  <div class="view-bar"><span class="meta" id="metaCount"></span><button class="flt-btn" onclick="openFilters()"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z"/></svg>Filters<span class="flt-n" id="fltN"></span></button></div>
+  <div class="flt-backdrop" onclick="closeFilters()"></div>
 
   <!-- Transactions view -->
   <div class="panel" id="tblWrap">
@@ -509,7 +569,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
       <input type="hidden" id="fId">
       <div class="fr">
         <div class="fg"><label>Date</label><input type="date" id="fDate"></div>
-        <div class="fg"><label>Amount (SGD)</label><input type="number" id="fAmt" placeholder="0.00" step="0.01" min="0"></div>
+        <div class="fg"><label>Amount (SGD)</label><input type="text" inputmode="decimal" autocomplete="off" id="fAmt" placeholder="0.00"></div>
       </div>
       <div class="fg"><label>Description</label><input type="text" id="fDesc" placeholder="What was this?"></div>
 
@@ -563,6 +623,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
         </div>
       </div>
       <div class="form-acts">
+        <button class="btn btn-del" id="fDelBtn" onclick="deleteFromModal()">Delete</button>
         <button class="btn" onclick="closeModal('mAdd')">Cancel</button>
         <button class="btn btn-solid" onclick="saveTx()">Save</button>
       </div>
@@ -581,7 +642,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
       <input type="hidden" id="sfId">
       <div class="fg"><label>Service name</label><input type="text" id="sfName" placeholder="e.g. Spotify, Claude, GOMO"></div>
       <div class="fr">
-        <div class="fg"><label>Amount (SGD)</label><input type="number" id="sfAmt" placeholder="0.00" step="0.01" min="0"></div>
+        <div class="fg"><label>Amount (SGD)</label><input type="text" inputmode="decimal" autocomplete="off" id="sfAmt" placeholder="0.00"></div>
         <div class="fg"><label>Billing cycle</label>
           <select id="sfCycle">
             <option value="weekly">Weekly</option>
@@ -624,7 +685,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
       <button class="modal-close" onclick="closeModal('mStmt')">×</button>
     </div>
     <div class="modal-body">
-      <div class="fg"><label>Statement Amount (SGD)</label><input type="number" id="sfStmtAmt" placeholder="0.00" step="0.01" min="0"></div>
+      <div class="fg"><label>Statement Amount (SGD)</label><input type="text" inputmode="decimal" autocomplete="off" id="sfStmtAmt" placeholder="0.00"></div>
       <div class="fr">
         <div class="fg"><label>Statement Date</label><input type="date" id="sfStmtDate"></div>
         <div class="fg"><label>Payment Due Date</label><input type="date" id="sfStmtDue"></div>
@@ -878,6 +939,7 @@ function setView(mode) {
   document.getElementById('subsView').style.display    = mode==='subs'  ? ''     : 'none';
   document.getElementById('ccView').style.display      = mode==='cc'    ? ''     : 'none';
   document.getElementById('filtersBar').style.display  = mode==='table' ? ''     : 'none';
+  document.body.dataset.view = mode;
   [['btnTable','table'],['btnChart','chart'],['btnSubs','subs'],['btnCC','cc']]
     .forEach(([id,m]) => document.getElementById(id).classList.toggle('on', mode===m));
   // FAB: hide on CC view (has its own add-statement buttons)
@@ -888,6 +950,7 @@ function setView(mode) {
   else if (mode==='subs')  renderSubs();
   else if (mode==='cc')    renderCC();
   renderCardTabs();
+  renderFilterBadge();
   renderMeta();
 }
 
@@ -970,6 +1033,7 @@ function _doRender() {
   view.sort((a,b) => sortK==='amount' ? sortD*(a.amount-b.amount) : sortD*String(a[sortK]).localeCompare(String(b[sortK])));
 
   renderCardTabs();
+  renderFilterBadge();
   renderMeta();
   if      (viewMode==='table') renderTable();
   else if (viewMode==='chart') renderChart();
@@ -977,6 +1041,18 @@ function _doRender() {
   // CC view: doesn't respond to filter changes, re-rendered only when data changes
 }
 function toggleSort(k) { if(sortK===k) sortD*=-1; else{sortK=k;sortD=-1;} _doRender(); }
+// ═══ Mobile filter sheet ═══════════════════════════════════════
+function openFilters()  { document.body.classList.add('show-filters'); }
+function closeFilters() { document.body.classList.remove('show-filters'); }
+function renderFilterBadge() {
+  const el = document.getElementById('fltN'); if (!el) return;
+  const df = document.getElementById('dateFrom').value, dt = document.getElementById('dateTo').value;
+  const n = (df||dt ? 1 : 0) + ['cats','types','statuses'].filter(k => filterState[k].length).length;
+  el.textContent = n ? n : ''; el.style.display = n ? '' : 'none';
+}
+// Clicks inside a dropdown shouldn't close it (lets you tick several boxes)
+document.querySelectorAll('.mf-panel').forEach(p => p.addEventListener('click', e => e.stopPropagation()));
+
 function resetFilters() {
   const df=document.getElementById('dateFrom'); if(df) df.value='';
   const dt=document.getElementById('dateTo');   if(dt) dt.value='';
@@ -1072,25 +1148,20 @@ function renderTable() {
     </tr></thead>
     <tbody>${rows}</tbody></table>`;
 
-  // ── Mobile cards ───────────────────────────────────────
-  let cards='',lastMoC='';
+  // ── Mobile rows (two lines) with month totals ──────────
+  const moOut = {};
+  view.forEach(t => { if (OUT_TYPES.has(t.type)) moOut[t.date.slice(0,7)] = (moOut[t.date.slice(0,7)]||0) + t.amount; });
+  let cards='', lastMoC='';
   view.forEach(t=>{
     const mo=t.date.slice(0,7);
-    if(mo!==lastMoC&&sortK==='date'){cards+=`<div class="mo-sep">${fmtMo(mo)}</div>`;lastMoC=mo;}
-    const isOut=OUT_TYPES.has(t.type);
-    const id=esc(t.id);
-    cards+=`<div class="tx-card" onclick="openEdit('${id}')">
-      <div class="txc-row1">
-        <span class="txc-date">${fmtDay(t.date)}</span>
-        <span class="txc-amt ${isOut?'out':'in'}">${isOut?'−':'+'} ${fmt(t.amount)}</span>
-      </div>
-      <div class="txc-desc">${esc(t.description)}</div>
-      <div class="txc-meta">
-        ${catPill(t.category)}
-        <span class="card-tag">${esc(t.card)}</span>
-        ${ccBadge(t)}
-        <button class="txc-del" onclick="event.stopPropagation();deleteTx('${id}')">×</button>
-      </div>
+    if (mo!==lastMoC && sortK==='date') {
+      cards+=`<div class="mo-sep"><span>${fmtMo(mo)}</span><span class="mo-tot">${moOut[mo]?'− '+fmt(moOut[mo]):''}</span></div>`;
+      lastMoC=mo;
+    }
+    const isOut=OUT_TYPES.has(t.type), id=esc(t.id), col=CAT_COLOR[t.category]||'var(--w2)';
+    cards+=`<div class="tx-row" onclick="openEdit('${id}')">
+      <div class="txr-l1"><span class="txr-desc">${esc(t.description)}</span><span class="txr-amt ${isOut?'out':'in'}">${isOut?'−':'+'} ${fmt(t.amount)}</span></div>
+      <div class="txr-l2"><span>${fmtSho(t.date)}</span><i>·</i><span style="color:${col}">${esc(t.category)}</span><i>·</i><span>${esc(t.card)}</span>${ccBadge(t)}</div>
     </div>`;
   });
 
@@ -1529,7 +1600,7 @@ function openAddStatement(cardName) {
   setTimeout(()=>document.getElementById('sfStmtAmt').focus(), 80);
 }
 async function saveStatement() {
-  const amt  = parseFloat(document.getElementById('sfStmtAmt').value);
+  const amt  = parseFloat(document.getElementById('sfStmtAmt').value.replace(/,/g,''));
   const date = document.getElementById('sfStmtDate').value;
   if (!date || isNaN(amt) || amt < 0) { toast('Amount and statement date required','bad'); return; }
   const card = getCard(stmtEditCard);
@@ -1640,6 +1711,7 @@ function autoType() { syncType(null); }
 
 function openAdd() {
   document.getElementById('mAddTitle').textContent='New transaction';
+  document.getElementById('fDelBtn').style.display='none';
   document.getElementById('fId').value='';
   document.getElementById('fDate').value=new Date().toISOString().slice(0,10);
   document.getElementById('fAmt').value='';
@@ -1653,6 +1725,7 @@ function openAdd() {
 function openEdit(id) {
   const t=txs.find(x=>x.id===id); if(!t) return;
   document.getElementById('mAddTitle').textContent='Edit transaction';
+  document.getElementById('fDelBtn').style.display='';
   document.getElementById('fId').value=t.id;
   document.getElementById('fDate').value=t.date;
   document.getElementById('fAmt').value=t.amount;
@@ -1667,7 +1740,7 @@ function openEdit(id) {
 async function saveTx() {
   const id=document.getElementById('fId').value;
   const desc=document.getElementById('fDesc').value.trim();
-  const amt=parseFloat(document.getElementById('fAmt').value);
+  const amt=parseFloat(document.getElementById('fAmt').value.replace(/,/g,''));
   const date=document.getElementById('fDate').value;
   const card=document.getElementById('fCardF').value;
   if(!desc||isNaN(amt)||amt<0||!date){toast('Fill in all required fields','bad');return;}
@@ -1683,6 +1756,12 @@ async function saveTx() {
     if (viewMode !== 'chart') setTimeout(() => setView('chart'), 80);
   }
   try{await save();}catch(_){}
+}
+function deleteFromModal() {
+  const id = document.getElementById('fId').value;
+  if (!id) return;
+  closeModal('mAdd');
+  deleteTx(id);
 }
 async function deleteTx(id) {
   if(!confirm('Delete this transaction?')) return;
@@ -1734,7 +1813,7 @@ function openEditSub(id) {
 async function saveSub() {
   const id  =document.getElementById('sfId').value;
   const name=document.getElementById('sfName').value.trim();
-  const amt =parseFloat(document.getElementById('sfAmt').value);
+  const amt =parseFloat(document.getElementById('sfAmt').value.replace(/,/g,''));
   if(!name||isNaN(amt)||amt<0){toast('Name and amount required','bad');return;}
   const s={
     id:id||crypto.randomUUID(),
