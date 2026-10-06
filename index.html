@@ -1158,52 +1158,41 @@ function subSort(k) {
 let chartPayIdx   = -1;   // -1 = latest period
 let chartDrillCat = null; // null = overview, string = drilled category
 
-// Build pay periods from salary transactions; each period carries its expense txs
+// Monthly Expenses rules:
+//  • A period runs from one Salary transaction to the next; titled by the salary's month.
+//  • Card Payment and Investments are not spending → excluded.
+//  • Refunds/cashback (type Gain) under a spending category reduce that category.
+//  • Income = Salary + Interest.
+const MX_EXCLUDE = new Set(['Card Payment','Investments']);
+const MX_INCOME  = new Set(['Salary','Interest']);
+const mxSigned   = t => OUT_TYPES.has(t.type) ? t.amount : -t.amount;   // spend +, refund −
+
 function getPayPeriods() {
-  const salaries = txs.filter(t=>t.category==='Salary').sort((a,b)=>a.date.localeCompare(b.date));
-  const expenses = txs.filter(t=>OUT_TYPES.has(t.type));
-  // All salary transactions (for summing per period)
-  const allSalaryTxs = txs.filter(t=>t.category==='Salary');
-  const salaryInRange = (start, end) => allSalaryTxs.filter(t=>
-    (!start || t.date >= start) && (!end || t.date < end)
-  ).reduce((s,t)=>s+t.amount, 0);
+  const spend = txs.filter(t =>
+    !MX_EXCLUDE.has(t.category) && !MX_INCOME.has(t.category) &&
+    (OUT_TYPES.has(t.type) || t.type === 'Gain'));
+  const salaries = txs.filter(t => t.category === 'Salary').sort((a,b) => a.date.localeCompare(b.date));
+  const inRange  = (list, start, end) => list.filter(t => (!start || t.date >= start) && (!end || t.date < end));
+  const sumCat   = (cat, start, end) => inRange(txs.filter(t => t.category === cat), start, end).reduce((s,t) => s + t.amount, 0);
+  const make = (start, end) => {
+    const [y, m, d] = start.split('-').map(Number);
+    return {
+      title:    new Date(y, m-1, d).toLocaleString('en-SG', { month:'long' }),
+      sub:      `${y} · ${fmtSho(start)} → ${end ? fmtSho(end) : 'now'}`,
+      txs:      inRange(spend, start, end),
+      salary:   sumCat('Salary',   start, end),
+      interest: sumCat('Interest', start, end),
+      start, end,
+    };
+  };
+
+  if (!spend.length && !salaries.length) return [];
+  if (!salaries.length) return [make(spend.reduce((a,t) => t.date < a ? t.date : a, '9999'), null)];
 
   const periods = [];
-
-  if (!salaries.length) {
-    periods.push({ label:'All time', shortLabel:'All', txs:expenses, salaryTotal:0, start:null, end:null });
-    return periods;
-  }
-
-  // Expenses before first salary
-  const pre = expenses.filter(t=>t.date<salaries[0].date);
-  if (pre.length) {
-    const earliest = pre.reduce((a,b)=>a.date<b.date?a:b).date;
-    periods.push({
-      label:`Before pay  (${fmtSho(earliest)} → ${fmtSho(salaries[0].date)})`,
-      shortLabel:'Before pay',
-      txs: pre,
-      salaryTotal: 0,
-      start: earliest,
-      end: salaries[0].date,
-    });
-  }
-
-  // One period per salary
-  salaries.forEach((sal,i)=>{
-    const start = sal.date;
-    const end   = i+1 < salaries.length ? salaries[i+1].date : null;
-    const chunk = expenses.filter(t=>t.date>=start && (end===null||t.date<end));
-    periods.push({
-      label:       `Pay ${i+1}  (${fmtSho(start)} → ${end?fmtSho(end):'now'})`,
-      shortLabel:  `Pay ${i+1}`,
-      txs:         chunk,
-      salaryTotal: salaryInRange(start, end),
-      start,
-      end,
-    });
-  });
-
+  const pre = spend.filter(t => t.date < salaries[0].date);
+  if (pre.length) periods.push(make(pre.reduce((a,t) => t.date < a ? t.date : a, '9999'), salaries[0].date));
+  salaries.forEach((s, i) => periods.push(make(s.date, salaries[i+1] ? salaries[i+1].date : null)));
   return periods;
 }
 
@@ -1246,24 +1235,52 @@ function renderChart() {
   if (!txs.length) { el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No data loaded yet.</p></div>`; return; }
 
   const periods = getPayPeriods();
-  if (!periods.length) { el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No pay periods found. Add a Salary transaction to define periods.</p></div>`; return; }
+  if (!periods.length) { el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No expenses yet.</p></div>`; return; }
 
   const idx    = (chartPayIdx<0||chartPayIdx>=periods.length) ? periods.length-1 : chartPayIdx;
   const period = periods[idx];
-
-  // Drill-down view
   if (chartDrillCat) { renderCategoryDrill(el, chartDrillCat, period); return; }
 
-  const total = period.txs.reduce((s,t)=>s+t.amount, 0);
-  if (!total) { el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No expenses in this pay period.</p></div>`; return; }
+  // Net spend per category (spend − refunds); only categories still net positive are charted
+  const byCategory = {};
+  period.txs.forEach(t => { byCategory[t.category] = (byCategory[t.category]||0) + mxSigned(t); });
+  const segments = Object.entries(byCategory).map(([cat,amount]) => ({cat,amount}))
+    .filter(p => p.amount > 0.005).sort((a,b) => b.amount - a.amount);
+  const total = segments.reduce((s,p) => s + p.amount, 0);
 
-  // Category breakdown
-  const byCategory={};
-  period.txs.forEach(t=>{byCategory[t.category]=(byCategory[t.category]||0)+t.amount;});
-  const segments=Object.entries(byCategory).map(([cat,amount])=>({cat,amount})).sort((a,b)=>b.amount-a.amount);
+  const nav = `
+    <div class="period-nav">
+      <button class="pnav-btn" onclick="navPeriod(-1)" ${idx===0?'disabled':''}>←</button>
+      <div class="period-nav-lbl">
+        <div class="period-nav-title">${esc(period.title)}</div>
+        <div class="period-nav-sub">${esc(period.sub)} · ${period.txs.length} transactions</div>
+      </div>
+      <button class="pnav-btn" onclick="navPeriod(1)" ${idx===periods.length-1?'disabled':''}>→</button>
+    </div>`;
 
-  const legendRows=segments.map(p=>{
-    const c=CAT_COLOR[p.cat]||'#aaa';
+  const income    = period.salary + period.interest;
+  const remaining = income - total;
+  const salBar = income > 0 ? `
+    <div class="sal-bar">
+      <div class="sal-cell">
+        <div class="sal-lbl">Income</div>
+        <div class="sal-val" style="color:#4ade80">+ ${fmt(income)}</div>
+        <div class="tc-sub" style="font-size:10px;color:var(--w3);margin-top:3px">Salary ${fmt(period.salary)} · Interest ${fmt(period.interest)}</div>
+      </div>
+      <div class="sal-cell">
+        <div class="sal-lbl">Total spent</div>
+        <div class="sal-val" style="color:#f43f5e">− ${fmt(total)}</div>
+      </div>
+      <div class="sal-cell">
+        <div class="sal-lbl">${remaining>=0?'Remaining':'Over budget'}</div>
+        <div class="sal-val" style="color:${remaining>=0?'#4ade80':'#f43f5e'}">${remaining>=0?'+':'−'} ${fmt(Math.abs(remaining))}</div>
+      </div>
+    </div>` : '';
+
+  if (!total) { el.innerHTML = nav + salBar + `<div class="empty"><div class="empty-ico">—</div><p>No spending in this period.</p></div>`; return; }
+
+  const legendRows = segments.map(p => {
+    const c = CAT_COLOR[p.cat]||'#aaa';
     return `<div class="chart-legend-row" onclick="drillCategory('${esc(p.cat)}')" style="cursor:pointer" title="Click to see transactions">
       <div class="leg-swatch" style="background:${c}"></div>
       <div class="leg-label">${esc(p.cat)}</div>
@@ -1272,35 +1289,7 @@ function renderChart() {
     </div>`;
   }).join('');
 
-  const salary    = period.salaryTotal || 0;
-  const remaining = salary - total;
-  const salBar = salary > 0
-    ? `<div class="sal-bar">
-        <div class="sal-cell">
-          <div class="sal-lbl">Salary received</div>
-          <div class="sal-val" style="color:#4ade80">+ ${fmt(salary)}</div>
-        </div>
-        <div class="sal-cell">
-          <div class="sal-lbl">Total spent</div>
-          <div class="sal-val" style="color:#f43f5e">− ${fmt(total)}</div>
-        </div>
-        <div class="sal-cell">
-          <div class="sal-lbl">${remaining>=0?'Remaining':'Over budget'}</div>
-          <div class="sal-val" style="color:${remaining>=0?'#4ade80':'#f43f5e'}">${remaining>=0?'+':'−'} ${fmt(Math.abs(remaining))}</div>
-        </div>
-      </div>`
-    : '';
-
-  el.innerHTML=`
-    <div class="period-nav">
-      <button class="pnav-btn" onclick="navPeriod(-1)" ${idx===0?'disabled':''}>←</button>
-      <div class="period-nav-lbl">
-        <div class="period-nav-title">${esc(period.label)}</div>
-        <div class="period-nav-sub">${period.txs.length} transactions</div>
-      </div>
-      <button class="pnav-btn" onclick="navPeriod(1)" ${idx===periods.length-1?'disabled':''}>→</button>
-    </div>
-    ${salBar}
+  el.innerHTML = nav + salBar + `
     <div class="chart-inner">
       <div class="chart-donut-col">
         ${buildCategoryDonut(segments,total)}
@@ -1309,7 +1298,7 @@ function renderChart() {
         </div>
       </div>
       <div class="chart-legend-col">
-        <div class="chart-legend-head">Monthly expenses by category — click any slice or row</div>
+        <div class="chart-legend-head">Spending by category · refunds netted · excludes Card Payment &amp; Investments</div>
         ${legendRows}
         <div class="chart-total-row"><div></div><div class="leg-label">Total spent</div><div class="leg-pct">100%</div><div class="leg-amt" style="color:#f43f5e">${fmt(total)}</div></div>
       </div>
@@ -1317,10 +1306,10 @@ function renderChart() {
 }
 
 function renderCategoryDrill(el, cat, period) {
-  const catTxs  = period.txs.filter(t=>t.category===cat).sort((a,b)=>b.date.localeCompare(a.date));
-  const totalOut = catTxs.reduce((s,t)=>s+t.amount,0);
-  const rows = catTxs.map(t=>{
-    const isOut=OUT_TYPES.has(t.type);
+  const catTxs = period.txs.filter(t => t.category === cat).sort((a,b) => b.date.localeCompare(a.date));
+  const net    = catTxs.reduce((s,t) => s + mxSigned(t), 0);
+  const rows = catTxs.map(t => {
+    const isOut = OUT_TYPES.has(t.type);
     return `<div class="drill-row" onclick="openEdit('${esc(t.id)}')">
       <span class="drill-date">${fmtDay(t.date)}</span>
       <span class="drill-desc">${esc(t.description)}</span>
@@ -1328,12 +1317,12 @@ function renderCategoryDrill(el, cat, period) {
       <span class="drill-amt ${isOut?'out':'in'}">${isOut?'−':'+'} ${fmt(t.amount)}</span>
     </div>`;
   }).join('');
-  el.innerHTML=`
+  el.innerHTML = `
     <div class="drill-header" onclick="chartDrillCat=null;renderChart()">
       <span class="drill-back">←</span>
       <span class="pill ${CAT_CLASS[cat]||''}">${esc(cat)}</span>
-      <span class="drill-title" style="font-size:11px;color:var(--w3)">${esc(period.label)}</span>
-      <span class="drill-count">${catTxs.length} txn · ${fmt(totalOut)}</span>
+      <span class="drill-title" style="font-size:11px;color:var(--w3)">${esc(period.title)}</span>
+      <span class="drill-count">${catTxs.length} txn · net ${fmt(net)}</span>
     </div>
     ${rows||`<div class="empty"><div class="empty-ico">—</div><p>No transactions in this category for this period.</p></div>`}`;
 }
