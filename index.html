@@ -80,8 +80,14 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 .tc-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
 .tc-sub{font-size:10px;color:var(--w3);margin-top:3px}
 .meta{font-size:11px;color:var(--w3)}
-.tabs{display:flex;gap:0}
-.tabs .btn{border-radius:0;margin-left:-1px;padding:5px 14px;font-size:11px}
+/* Main navigation — segmented control */
+.main-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;margin-bottom:12px;background:var(--s1);border:1px solid var(--b1)}
+.mtab{display:flex;align-items:center;justify-content:center;gap:8px;padding:11px 8px;background:transparent;border:none;color:var(--w3);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.mtab:hover{color:var(--w1);background:var(--s2)}
+.mtab.on{background:var(--w1);color:var(--bg);font-weight:600}
+.mt-ico{font-size:13px;opacity:.7;line-height:1}
+.mtab.on .mt-ico{opacity:1}
+.mt-short{display:none}
 
 /* ── Generic table styles (shared by transactions + subs) ── */
 .panel{border:1px solid var(--b1);background:var(--bg);overflow-x:auto}
@@ -325,9 +331,11 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   .card-tab{flex:none;padding:10px 12px}
   .f-drops .fi{min-width:calc(50% - 3px);flex:none}
   /* View bar: stack tabs below meta */
-  .view-bar{flex-direction:column;gap:6px;align-items:stretch}
-  .tabs{overflow-x:auto;display:flex}
-  .tabs .btn{flex:1;font-size:10px;padding:7px 4px;text-align:center;white-space:nowrap}
+  .main-tabs{gap:3px;padding:3px;margin-bottom:10px}
+  .mtab{flex-direction:column;gap:3px;padding:8px 2px;font-size:11px}
+  .mt-ico{font-size:15px}
+  .mt-full{display:none}
+  .mt-short{display:inline}
   /* Switch to card layout */
   .tbl-desktop{display:none}
   .tbl-mobile{display:block}
@@ -380,6 +388,14 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 </header>
 
 <div class="wrap">
+
+  <!-- Main navigation -->
+  <nav class="main-tabs">
+    <button class="mtab on" id="btnTable" onclick="setView('table')"><span class="mt-ico">☰</span><span class="mt-full">Transactions</span><span class="mt-short">Txns</span></button>
+    <button class="mtab"    id="btnChart" onclick="setView('chart')"><span class="mt-ico">◔</span><span class="mt-full">Monthly Expenses</span><span class="mt-short">Monthly</span></button>
+    <button class="mtab"    id="btnSubs"  onclick="setView('subs')"><span class="mt-ico">↻</span><span class="mt-full">Subscriptions</span><span class="mt-short">Subs</span></button>
+    <button class="mtab"    id="btnCC"    onclick="setView('cc')"><span class="mt-ico">▭</span><span class="mt-full">Credit Cards</span><span class="mt-short">Cards</span></button>
+  </nav>
 
   <!-- Filters (table-only) -->
   <div class="filters" id="filtersBar">
@@ -444,16 +460,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
     </div>
   </div>
 
-  <!-- View bar -->
-  <div class="view-bar">
-    <span class="meta" id="metaCount"></span>
-    <div class="tabs">
-      <button class="btn btn-solid" id="btnTable" onclick="setView('table')">Transactions</button>
-      <button class="btn"           id="btnChart" onclick="setView('chart')">Monthly Expenses</button>
-      <button class="btn"           id="btnSubs"  onclick="setView('subs')">Subscriptions</button>
-      <button class="btn"           id="btnCC"    onclick="setView('cc')">Credit Cards</button>
-    </div>
-  </div>
+  <div class="view-bar"><span class="meta" id="metaCount"></span></div>
 
   <!-- Transactions view -->
   <div class="panel" id="tblWrap">
@@ -859,10 +866,8 @@ function setView(mode) {
   document.getElementById('subsView').style.display    = mode==='subs'  ? ''     : 'none';
   document.getElementById('ccView').style.display      = mode==='cc'    ? ''     : 'none';
   document.getElementById('filtersBar').style.display  = mode==='table' ? ''     : 'none';
-  document.getElementById('btnTable').className = 'btn'+(mode==='table' ?' btn-solid':'');
-  document.getElementById('btnChart').className = 'btn'+(mode==='chart' ?' btn-solid':'');
-  document.getElementById('btnSubs').className  = 'btn'+(mode==='subs'  ?' btn-solid':'');
-  document.getElementById('btnCC').className    = 'btn'+(mode==='cc'    ?' btn-solid':'');
+  [['btnTable','table'],['btnChart','chart'],['btnSubs','subs'],['btnCC','cc']]
+    .forEach(([id,m]) => document.getElementById(id).classList.toggle('on', mode===m));
   // FAB: hide on CC view (has its own add-statement buttons)
   document.getElementById('fabBtn').style.display = mode==='cc' ? 'none' : '';
 
