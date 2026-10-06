@@ -1182,6 +1182,8 @@ function getPayPeriods() {
       txs:      inRange(spend, start, end),
       salary:   sumCat('Salary',   start, end),
       interest: sumCat('Interest', start, end),
+      excluded: Object.fromEntries([...MX_EXCLUDE].map(cat =>
+        [cat, inRange(txs.filter(t => t.category === cat), start, end).reduce((s,t) => s + mxSigned(t), 0)])),
       start, end,
     };
   };
@@ -1258,8 +1260,10 @@ function renderChart() {
       <button class="pnav-btn" onclick="navPeriod(1)" ${idx===periods.length-1?'disabled':''}>→</button>
     </div>`;
 
-  const income    = period.salary + period.interest;
-  const remaining = income - total;
+  const income   = period.salary + period.interest;
+  const cardPay  = period.excluded['Card Payment'] || 0;
+  const invest   = period.excluded['Investments']  || 0;
+  const allOut   = total + cardPay + invest;
   const salBar = income > 0 ? `
     <div class="sal-bar">
       <div class="sal-cell">
@@ -1272,8 +1276,9 @@ function renderChart() {
         <div class="sal-val" style="color:#f43f5e">− ${fmt(total)}</div>
       </div>
       <div class="sal-cell">
-        <div class="sal-lbl">${remaining>=0?'Remaining':'Over budget'}</div>
-        <div class="sal-val" style="color:${remaining>=0?'#4ade80':'#f43f5e'}">${remaining>=0?'+':'−'} ${fmt(Math.abs(remaining))}</div>
+        <div class="sal-lbl">Total transactions</div>
+        <div class="sal-val" style="color:#f43f5e">− ${fmt(allOut)}</div>
+        <div style="font-size:10px;color:var(--w3);margin-top:3px">Spent ${fmt(total)} · Card Payment ${fmt(cardPay)} · Investments ${fmt(invest)}</div>
       </div>
     </div>` : '';
 
