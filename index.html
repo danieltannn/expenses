@@ -40,15 +40,6 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 .wrap{max-width:1280px;margin:0 auto;padding:20px 22px 80px}
 
 /* ── Monthly category spending bar ── */
-.cat-bar{border:1px solid var(--b1);background:var(--s1);margin-bottom:10px}
-.cat-bar-head{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-bottom:1px solid var(--b1)}
-.cat-bar-month{font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.4px;text-transform:uppercase}
-.cat-bar-total{font-family:var(--mono);font-size:12px;color:var(--w2)}
-.cat-chips{display:flex;flex-wrap:wrap;gap:6px;padding:9px 14px}
-.cat-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid;font-size:12px;cursor:pointer;transition:opacity .15s}
-.cat-chip:hover{opacity:.7}
-.cat-chip-name{font-weight:500}
-.cat-chip-amt{font-family:var(--mono);font-size:11px}
 
 /* ── Filters ── */
 .filters{padding:8px 12px;background:var(--s1);border:1px solid var(--b1);margin-bottom:10px}
@@ -72,6 +63,13 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 .mf-clr:hover{color:var(--w1)}
 .fi-reset{background:none;border:none;color:var(--w3);font-size:13px;cursor:pointer;padding:4px 8px;font-family:var(--font);transition:color .15s;flex-shrink:0;height:30px}
 .fi-reset:hover{color:var(--w1)}
+/* Per-card tabs */
+.card-tabs{display:flex;margin:-8px -12px 8px;border-bottom:1px solid var(--b1);overflow-x:auto;scrollbar-width:none}
+.card-tabs::-webkit-scrollbar{display:none}
+.card-tab{flex:1;padding:11px 14px;background:none;border:none;border-bottom:2px solid transparent;color:var(--w3);font-size:12px;font-family:var(--font);cursor:pointer;white-space:nowrap;transition:color .15s,border-color .15s}
+.card-tab:hover{color:var(--w1)}
+.card-tab.on{color:var(--w1);border-bottom-color:var(--w1);font-weight:600}
+.ct-n{font-family:var(--mono);font-size:10px;color:var(--w3);margin-left:5px;font-weight:400}
 
 /* ── View bar ── */
 .view-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
@@ -95,7 +93,7 @@ table{width:100%;border-collapse:collapse;min-width:640px}
 .tx-table .col-cat {width:110px}
 .tx-table .col-card{width:120px}
 .tx-table .col-sta {width:130px}
-.tx-table .col-amt {width:120px;text-align:right}
+.tx-table .col-amt {width:160px;text-align:right}
 .tx-table .col-del {width:36px}
 thead th{background:var(--s1);border-bottom:1px solid var(--b1);padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--w3);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
 thead th:hover{color:var(--w2)}
@@ -324,6 +322,7 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   .subs-summary .ss-cell:last-child{grid-column:1/-1}
   /* Filters: wrap to 2 cols on mobile */
   .f-drops{flex-wrap:wrap}
+  .card-tab{flex:none;padding:10px 12px}
   .f-drops .fi{min-width:calc(50% - 3px);flex:none}
   /* View bar: stack tabs below meta */
   .view-bar{flex-direction:column;gap:6px;align-items:stretch}
@@ -382,15 +381,9 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
 
 <div class="wrap">
 
-  <!-- Monthly category spending bar -->
-  <div class="cat-bar" id="catBar">
-    <div class="cat-bar-head">
-      <span class="cat-bar-month">Loading…</span>
-    </div>
-  </div>
-
   <!-- Filters (table-only) -->
   <div class="filters" id="filtersBar">
+    <div class="card-tabs" id="cardTabs"></div>
     <div class="f-drops">
       <!-- Date range -->
       <input class="date-fi" type="date" id="dateFrom" onchange="render()" title="From date">
@@ -415,21 +408,6 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
             <label class="mf-opt"><input type="checkbox" value="Card Payment" onchange="mfChange('cats',this.value,this.checked)"><div class="mf-dot" style="background:#94a3b8"></div>Card Payment</label>
           </div>
           <div class="mf-foot"><button class="mf-clr" onclick="mfClear('cats')">Clear</button></div>
-        </div>
-      </div>
-
-      <!-- Card -->
-      <div class="mf-wrap">
-        <button class="mf-btn" id="mfb-cards" onclick="toggleMF(event,'cards')">Card <span class="mf-badge" id="mf-count-cards" style="display:none"></span></button>
-        <div class="mf-panel" id="mf-cards" style="display:none">
-          <div class="mf-inner">
-            <label class="mf-opt"><input type="checkbox" value="DBS Debit"    onchange="mfChange('cards',this.value,this.checked)">DBS Debit</label>
-            <label class="mf-opt"><input type="checkbox" value="Citi Rewards" onchange="mfChange('cards',this.value,this.checked)">Citi Rewards</label>
-            <label class="mf-opt"><input type="checkbox" value="HSBC"         onchange="mfChange('cards',this.value,this.checked)">HSBC</label>
-            <label class="mf-opt"><input type="checkbox" value="Trust"        onchange="mfChange('cards',this.value,this.checked)">Trust</label>
-            <label class="mf-opt"><input type="checkbox" value="UOB Ladys"    onchange="mfChange('cards',this.value,this.checked)">UOB Ladys</label>
-          </div>
-          <div class="mf-foot"><button class="mf-clr" onclick="mfClear('cards')">Clear</button></div>
         </div>
       </div>
 
@@ -892,7 +870,7 @@ function setView(mode) {
   else if (mode==='chart') { chartDrillCat=null; renderChart(); }
   else if (mode==='subs')  renderSubs();
   else if (mode==='cc')    renderCC();
-  renderCatSpending();
+  renderCardTabs();
   renderMeta();
 }
 
@@ -974,7 +952,7 @@ function _doRender() {
   });
   view.sort((a,b) => sortK==='amount' ? sortD*(a.amount-b.amount) : sortD*String(a[sortK]).localeCompare(String(b[sortK])));
 
-  renderCatSpending();
+  renderCardTabs();
   renderMeta();
   if      (viewMode==='table') renderTable();
   else if (viewMode==='chart') renderChart();
@@ -985,10 +963,27 @@ function toggleSort(k) { if(sortK===k) sortD*=-1; else{sortK=k;sortD=-1;} _doRen
 function resetFilters() {
   const df=document.getElementById('dateFrom'); if(df) df.value='';
   const dt=document.getElementById('dateTo');   if(dt) dt.value='';
-  ['cats','cards','types','statuses'].forEach(key => mfClear(key));
+  filterState.cards = [];
+  ['cats','types','statuses'].forEach(key => mfClear(key));
 }
 
-// ═══ Monthly category spending bar ════════════════════════════
+// ═══ Per-card tabs ═════════════════════════════════════════════
+const ALL_CARDS = ['DBS Debit','Citi Rewards','HSBC','Trust','UOB Ladys'];
+function selectCardTab(i) {
+  filterState.cards = i < 0 ? [] : [ALL_CARDS[i]];
+  _doRender();
+}
+function renderCardTabs() {
+  const el = document.getElementById('cardTabs');
+  if (!el) return;
+  const cur = filterState.cards.length === 1 ? filterState.cards[0] : null;
+  const tab = (label, i, n, on) =>
+    `<button class="card-tab${on?' on':''}" onclick="selectCardTab(${i})">${label}<span class="ct-n">${n}</span></button>`;
+  el.innerHTML = tab('All cards', -1, txs.length, !cur) +
+    ALL_CARDS.map((c,i) => tab(c, i, txs.filter(t=>t.card===c).length, c===cur)).join('');
+}
+
+// ═══ Category colours ══════════════════════════════════════════
 const CAT_COLOR = {
   Food:'#f59e0b', Transport:'#38bdf8', Lifestyle:'#a78bfa',
   Necessity:'#34d399', Subscription:'#fb7185', Travel:'#2dd4bf',
@@ -996,38 +991,6 @@ const CAT_COLOR = {
   Installment:'#f97316', 'Card Payment':'#94a3b8',
 };
 
-function renderCatSpending() {
-  const el = document.getElementById('catBar');
-  if (!txs.length) { el.style.display='none'; return; }
-  el.style.display='';
-  const periods = getPayPeriods();
-  if (!periods.length) { el.style.display='none'; return; }
-  // Always show the LATEST pay period
-  const latest = periods[periods.length - 1];
-  if (!latest.txs.length) {
-    el.innerHTML=`<div class="cat-bar-head"><span class="cat-bar-month">${latest.label} — no spending</span></div>`;
-    return;
-  }
-  const byCategory={};
-  latest.txs.forEach(t=>{byCategory[t.category]=(byCategory[t.category]||0)+t.amount;});
-  const sorted=Object.entries(byCategory).sort((a,b)=>b[1]-a[1]);
-  const total=sorted.reduce((s,[,v])=>s+v,0);
-  const chips=sorted.map(([cat,amount])=>{
-    const c=CAT_COLOR[cat]||'#aaa';
-    return `<div class="cat-chip" style="color:${c};border-color:${c}40;background:${c}18"
-      onclick="chartPayIdx=-1;setView('chart');setTimeout(()=>drillCategory('${esc(cat)}'),60)"
-      title="View in chart">
-      <span class="cat-chip-name">${esc(cat)}</span>
-      <span class="cat-chip-amt">${fmt(amount)}</span>
-    </div>`;
-  }).join('');
-  el.innerHTML=`
-    <div class="cat-bar-head">
-      <span class="cat-bar-month">${latest.label}</span>
-      <span class="cat-bar-total">${fmt(total)} out</span>
-    </div>
-    <div class="cat-chips">${chips}</div>`;
-}
 
 
 function renderMeta() {
@@ -1778,12 +1741,12 @@ async function saveSub() {
 }
 async function deleteSub(id) {
   if(!confirm('Delete this subscription?')) return;
-  subs=subs.filter(s=>s.id!==id); renderSubs(); renderCatSpending(); renderMeta();
+  subs=subs.filter(s=>s.id!==id); renderSubs(); renderMeta();
   try{await save();}catch(_){}
 }
 async function toggleSubActive(id) {
   const s=subs.find(x=>x.id===id); if(!s) return;
-  s.active=!s.active; renderSubs(); renderCatSpending();
+  s.active=!s.active; renderSubs();
   try{await save();}catch(_){}
 }
 
