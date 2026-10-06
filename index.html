@@ -743,35 +743,54 @@ function toast(msg, kind='ok') {
 }
 
 // ═══ GitHub API ════════════════════════════════════════════════
+// Data layer rules:
+//  • Load with Accept: vnd.github.raw → full file (any size), decoded as UTF-8 by fetch.
+//    (Old method: JSON content field + atob() — empty above 1MB, and atob() mangles
+//     non-ASCII text, which doubled "Dad’s" on every save until the file hit 1.6MB.)
+//  • SHA comes from the directory listing (tiny, no file content).
+//  • Saves are serialized; nothing is saved unless the last load succeeded.
+const API = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}`;
 function ghH(t) { return {'Authorization':'Bearer '+t,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'}; }
+
+let dataLoaded   = false;  // true only after a successful load
+let _saveRunning = false;
+let _saveAgain   = false;
+
+async function ghFetchSha(token) {
+  const r = await fetch(`${API}/contents/?ref=${REPO_BRANCH}`, { headers: ghH(token), cache: 'no-store' });
+  if (!r.ok) return null;
+  const f = (await r.json()).find(x => x.name === 'data.json');
+  return f ? f.sha : null;
+}
 
 async function ghGet() {
   const token = getToken();
   if (!token) throw new Error('No token set — open ⚙ Settings and enter your PAT');
   setStatus('busy','Loading…');
 
-  // Contents API — reads directly from git, never stale.
-  // raw.githubusercontent.com has a 5-minute CDN cache which caused Sync to
-  // revert saves. The Contents API response also includes the file SHA so
-  // we don't need a separate request for it.
-  const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`;
-  const res = await fetch(url, { headers: ghH(token), cache: 'no-store' });
+  const [res, sha] = await Promise.all([
+    fetch(`${API}/contents/data.json?ref=${REPO_BRANCH}`, {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.raw' },
+      cache: 'no-store',
+    }),
+    ghFetchSha(token).catch(() => null),
+  ]);
 
+  if (res.status === 401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
   if (res.status === 404) {
     localStorage.removeItem(SHA_K);
     setStatus('ok','New file');
     return { transactions:[], subscriptions:[], cards:{} };
   }
-  if (res.status === 401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
-  if (!res.ok) {
-    const e = await res.json().catch(()=>({}));
-    throw new Error(e.message || 'Load failed ' + res.status);
-  }
+  if (!res.ok) throw new Error('Load failed (' + res.status + ')');
 
-  const meta = await res.json();
-  localStorage.setItem(SHA_K, meta.sha); // store SHA for saves — no extra request needed
-  const data = JSON.parse(atob(meta.content.replace(/\s/g, '')));
+  const text = await res.text();              // UTF-8 decoded correctly by fetch
+  let data;
+  try { data = JSON.parse(text); }
+  catch (_) { throw new Error(`data.json is not valid JSON (${text.length} bytes) — nothing was changed`); }
+  if (!data || !Array.isArray(data.transactions)) throw new Error('data.json has no transactions list');
 
+  if (sha) localStorage.setItem(SHA_K, sha);
   setStatus('ok','Synced');
   return data;
 }
@@ -779,76 +798,80 @@ async function ghGet() {
 async function ghPut(data) {
   const token = getToken();
   if (!token) throw new Error('No token — open ⚙ Settings');
+  if (!data || !Array.isArray(data.transactions)) throw new Error('Save aborted: invalid data');
 
-  // Guard: never save empty or corrupted data
-  if (!data || typeof data !== 'object') throw new Error('Save aborted: invalid data');
-  const jsonStr = JSON.stringify(data);  // compact — no indent, smaller + faster
-  if (!jsonStr || jsonStr.length < 20) throw new Error('Save aborted: data too small');
-
-  // TextEncoder + chunked binary: reliable on iOS Safari for large strings
-  // (btoa(unescape(encodeURIComponent())) can silently truncate on mobile)
-  const utf8   = new TextEncoder().encode(jsonStr);
-  let   binary = '';
-  for (let i = 0; i < utf8.length; i += 4096)
-    binary += String.fromCharCode(...utf8.subarray(i, i + 4096));
+  const utf8 = new TextEncoder().encode(JSON.stringify(data));
+  let binary = '';
+  for (let i = 0; i < utf8.length; i += 8192)
+    binary += String.fromCharCode.apply(null, utf8.subarray(i, i + 8192));
   const content = btoa(binary);
-  if (!content || content.length < 20) throw new Error('Save aborted: encoding failed');
 
   setStatus('busy','Saving…');
+  const put = sha => fetch(`${API}/contents/data.json`, {
+    method: 'PUT', headers: ghH(token),
+    body: JSON.stringify({ message:'Update data '+new Date().toISOString().slice(0,10), content, branch:REPO_BRANCH, ...(sha ? {sha} : {}) }),
+  });
 
-  const doSave = async (sha) => {
-    const body = { message:'Update data '+new Date().toISOString().slice(0,10), content, branch:REPO_BRANCH };
-    if (sha) body.sha = sha;
-    return fetch(
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json`,
-      { method:'PUT', headers:ghH(token), body:JSON.stringify(body) }
-    );
-  };
-
-  let sha = localStorage.getItem(SHA_K);
-  let res = await doSave(sha);
-
-  // If SHA conflict (409), re-fetch SHA once and retry
-  if (res.status === 409) {
-    const check = await fetch(
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/data.json?ref=${REPO_BRANCH}`,
-      { headers: ghH(token) }
-    );
-    if (check.ok) { sha = (await check.json()).sha; localStorage.setItem(SHA_K, sha); }
-    res = await doSave(sha);
+  let res = await put(localStorage.getItem(SHA_K));
+  if (res.status === 409 || res.status === 422) {          // stale SHA → refresh once and retry
+    const sha = await ghFetchSha(token);
+    if (sha) localStorage.setItem(SHA_K, sha);
+    res = await put(sha);
   }
-
   if (res.status === 401) throw new Error('Bad credentials — tap ⚙ Settings and re-enter your PAT');
-  if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.message||'Save failed '+res.status); }
+  if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.message || 'Save failed ' + res.status); }
+
   const r = await res.json();
-  if (!r.content?.size || r.content.size < 100) {
-    throw new Error('GitHub stored corrupt file — please sync to restore and try again');
-  }
+  if (r.content?.size !== utf8.length) throw new Error(`Save size mismatch (${r.content?.size} vs ${utf8.length}) — tap Sync`);
   localStorage.setItem(SHA_K, r.content.sha);
   setStatus('ok','Saved');
 }
 
 // ═══ Load / Save ═══════════════════════════════════════════════
 async function load() {
+  dataLoaded = false;
   document.getElementById('tblWrap').innerHTML='<div class="loading"><div class="spin"></div><span>Loading…</span></div>';
   try {
-    const data=await ghGet();
+    const data = await ghGet();
     txs   = (data.transactions  ||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
     subs  = (data.subscriptions ||[]).slice();
     cards = data.cards || {};
-    _ccInited = false; ccStmtOpen.clear(); ccShowPaid.clear(); // re-init CC state
+    dataLoaded = true;
+    _ccInited = false; ccStmtOpen.clear(); ccShowPaid.clear();
     _doRender();
   } catch(e) {
     setStatus('err','Error');
     document.getElementById('tblWrap').innerHTML=`<div class="empty"><div class="empty-ico">✕</div><p>${esc(e.message)}</p></div>`;
+    throw e;
   }
 }
 
+// Serialized save: one PUT at a time; changes made mid-save are saved right after.
 async function save() {
-  try { await ghPut({transactions:txs, subscriptions:subs, cards}); toast('Saved'); }
-  catch(e) { setStatus('err','Failed'); toast(e.message,'bad'); throw e; }
+  if (!dataLoaded) {
+    toast('Not saved — data did not load. Tap Sync first.', 'bad');
+    throw new Error('not loaded');
+  }
+  if (_saveRunning) { _saveAgain = true; return; }
+  _saveRunning = true;
+  try {
+    do {
+      _saveAgain = false;
+      await ghPut({ transactions:txs, subscriptions:subs, cards });
+    } while (_saveAgain);
+    toast('Saved');
+  } catch(e) {
+    setStatus('err','Save failed'); toast(e.message,'bad'); throw e;
+  } finally {
+    _saveRunning = false;
+  }
 }
-function manualSync() { load().then(()=>toast('Synced')).catch(e=>toast(e.message,'bad')); }
+
+function manualSync() {
+  if (_saveRunning) { toast('Still saving — try again in a moment', 'bad'); return; }
+  load().then(()=>toast('Synced')).catch(()=>{});
+}
+window.addEventListener('beforeunload', e => { if (_saveRunning) { e.preventDefault(); e.returnValue = ''; } });
 
 // ═══ View ══════════════════════════════════════════════════════
 function setView(mode) {
@@ -1775,12 +1798,12 @@ async function applyCfg() {
   if (!token) { toast('PAT is required','bad'); return; }
   saveToken(token);
   closeModal('mSettings');
-  await load();
+  await load().catch(()=>{});
 }
 
 // ═══ Boot ══════════════════════════════════════════════════════
 (function init() {
-  if (getToken()) { load(); }
+  if (getToken()) { load().catch(()=>{}); }
   else {
     setStatus('','No token');
     document.getElementById('tblWrap').innerHTML=`<div class="empty"><div class="empty-ico">⚙</div><p>Click <strong>⚙ Settings</strong> to enter your GitHub PAT.<br><span style="font-size:11px;color:var(--w3)">${REPO_OWNER}/${REPO_NAME}</span></p></div>`;
