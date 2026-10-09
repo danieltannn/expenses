@@ -72,6 +72,7 @@ body{background:var(--bg);color:var(--w1);font-family:var(--font);min-height:100
 .fi-reset{background:none;border:none;color:var(--w3);font-size:13px;cursor:pointer;padding:4px 8px;font-family:var(--font);transition:color .15s;flex-shrink:0;height:30px}
 .fi-reset:hover{color:var(--w1)}
 .sheet-only{display:none}
+body[data-view="cc"] .view-bar{display:none}
 .reload-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0 2px;border-top:1px solid var(--b1)}
 .reload-t{font-size:13px;font-weight:500}
 .reload-s{font-size:11px;color:var(--w3);margin-top:2px}
@@ -359,8 +360,55 @@ select:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
   .date-fi{width:auto;height:36px}
 }
 
+
+/* ── Credit Cards (v2) ── */
+.ccx-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1);border:1px solid var(--b1);margin-bottom:12px}
+.ccx-sum-cell{background:var(--s1);padding:12px 16px}
+.ccx-k{font-size:10px;font-weight:600;color:var(--w3);text-transform:uppercase;letter-spacing:.4px}
+.ccx-k span{text-transform:none;letter-spacing:0;font-weight:400}
+.ccx-v{font-family:var(--mono);font-size:17px;font-weight:700;margin-top:4px}
+.ccx-v.overdue{color:#f43f5e}.ccx-v.soon{color:#f59e0b}
+.ccx-s{font-size:11px;color:var(--w3);margin-top:2px}
+.ccx-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.ccx-card{background:var(--bg);border:1px solid var(--b1);border-top:3px solid var(--accent);display:flex;flex-direction:column}
+.ccx-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--b1)}
+.ccx-name{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
+.ccx-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.ccx-pts{font-size:12px;color:var(--w2);cursor:pointer;font-family:var(--mono);white-space:nowrap}
+.ccx-pts:hover{color:var(--w1)}
+.ccx-body{padding:14px 16px;flex:1}
+.ccx-big{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--w1);margin:4px 0 8px;letter-spacing:-.5px}
+.ccx-bar{display:flex;height:4px;background:var(--s3);margin-bottom:8px;overflow:hidden}
+.ccx-bar span{display:block;height:100%}
+.ccx-split{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:var(--w2);font-family:var(--mono)}
+.ccx-split b{font-family:var(--font);font-weight:500;color:var(--w2);margin-right:4px}
+.ccx-split i{font-style:normal;color:var(--w3)}
+.ccx-due{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;padding:12px 14px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.35)}
+.ccx-due.over{background:rgba(244,63,94,.08);border-color:rgba(244,63,94,.45)}
+.ccx-due-amt{font-family:var(--mono);font-size:18px;font-weight:700;margin:3px 0 2px}
+.ccx-due-when{font-size:12px;color:#f59e0b;font-weight:600}
+.ccx-due-when.overdue{color:#f43f5e}.ccx-due-when.ok{color:var(--w2);font-weight:400}
+.ccx-paybtn{background:var(--w1);color:var(--bg);border:none;font-family:var(--font);font-size:12px;font-weight:600;padding:9px 14px;cursor:pointer;white-space:nowrap}
+.ccx-paybtn:hover{background:var(--w2)}
+.ccx-foot{border-top:1px solid var(--b1);padding:8px 16px 10px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px}
+.ccx-hist-head{font-size:12px;color:var(--w2);cursor:pointer;user-select:none;padding:4px 0}
+.ccx-hist-head i{font-style:normal;color:var(--w3);font-family:var(--mono);margin-left:4px}
+.ccx-hist-head:hover{color:var(--w1)}
+.ccx-nohist{font-size:12px;color:var(--w3)}
+.ccx-add{background:none;border:1px solid var(--b2);color:var(--w2);font-family:var(--font);font-size:12px;padding:6px 10px;cursor:pointer}
+.ccx-add:hover{border-color:var(--w1);color:var(--w1)}
+.ccx-hrow{order:3;width:100%;display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:center;padding:7px 0;border-top:1px solid var(--b1);font-size:12px}
+.ccx-hdate{color:var(--w2)}
+.ccx-hamt{font-family:var(--mono);color:var(--w2)}
+.ccx-hpaid{color:#4ade80;cursor:pointer;font-size:11px}
+.ccx-hpaid:hover{opacity:.7}
+
 /* ── Mobile ── */
 @media(max-width:700px){
+  .ccx-grid{grid-template-columns:1fr}
+  .ccx-sum-cell{padding:10px 10px}
+  .ccx-v{font-size:14px}
+  .ccx-big{font-size:22px}
   /* iOS zooms into any field under 16px — keep every input at 16px on phones */
   input,select,textarea,.fi,.date-fi,.cc-pts-input{font-size:16px !important}
   .date-fi{flex:1 1 130px;width:auto;min-width:0;height:36px}
@@ -1482,108 +1530,102 @@ function dueLblCC(dueDateStr, paid) {
   return { text:'Due ' + fmtDay(dueDateStr), cls:'ok' };
 }
 
+const CARD_ACCENT = { 'Citi Rewards':'#3b82f6', 'HSBC':'#ef4444', 'Trust':'#8b5cf6', 'UOB Ladys':'#ec4899' };
+
+function ccCardData(cardName) {
+  const card = getCard(cardName);
+  const net  = list => list.reduce((s,t) => s + (OUT_TYPES.has(t.type) ? t.amount : -t.amount), 0);
+  const open = txs.filter(t => t.card === cardName && !t.statementd);
+  const pend = open.filter(t => t.pending), conf = open.filter(t => !t.pending);
+  const stmts = (card.statements||[]).slice().sort((a,b) => (b.statementDate||'').localeCompare(a.statementDate||''));
+  return {
+    card, pend, conf,
+    pendAmt: net(pend), confAmt: net(conf), unbilled: net(open),
+    unpaid: stmts.filter(s => !s.paid).sort((a,b) => (a.dueDate||'9').localeCompare(b.dueDate||'9')),
+    paid:   stmts.filter(s =>  s.paid),
+  };
+}
+
+function ccCountdown(dateStr) {
+  const n = daysUntil(dateStr);
+  return { cls: n < 0 ? 'overdue' : n <= 7 ? 'soon' : 'ok',
+           text: n < 0 ? `overdue by ${-n}d` : n === 0 ? 'due today' : `in ${n} day${n>1?'s':''}` };
+}
+
 function renderCC() {
   const el = document.getElementById('ccWrap');
   if (!txs.length) { el.innerHTML=`<div class="empty"><div class="empty-ico">—</div><p>No transactions loaded yet.</p></div>`; return; }
+  const cardsData = [...CC].map(name => [name, ccCardData(name)]);
 
-  const CC_CARDS = [...CC]; // ['Citi Rewards','HSBC','Trust','UOB Ladys']
+  // ── Summary across all cards ──
+  const totUnbilled = cardsData.reduce((s,[,d]) => s + d.unbilled, 0);
+  const allUnpaid   = cardsData.flatMap(([,d]) => d.unpaid);
+  const totDue      = allUnpaid.reduce((s,x) => s + x.amount, 0);
+  const next        = allUnpaid.filter(x => x.dueDate).sort((a,b) => a.dueDate.localeCompare(b.dueDate))[0];
+  const nextLbl     = next ? ccCountdown(next.dueDate) : null;
+  const summary = `<div class="ccx-sum">
+    <div class="ccx-sum-cell"><div class="ccx-k">Unbilled</div><div class="ccx-v">${fmt(totUnbilled)}</div><div class="ccx-s">all cards</div></div>
+    <div class="ccx-sum-cell"><div class="ccx-k">Due</div><div class="ccx-v" style="color:${totDue?'#f59e0b':'var(--w2)'}">${fmt(totDue)}</div><div class="ccx-s">${allUnpaid.length} unpaid</div></div>
+    <div class="ccx-sum-cell"><div class="ccx-k">Next due</div><div class="ccx-v ${nextLbl?nextLbl.cls:''}" style="${next?'':'color:var(--w3)'}">${next ? fmtSho(next.dueDate) : '—'}</div><div class="ccx-s">${nextLbl ? nextLbl.text : 'nothing due'}</div></div>
+  </div>`;
 
-  el.innerHTML = CC_CARDS.map(cardName => {
-    const card     = getCard(cardName);
-    // All non-statemeneted transactions for this card
-    const unstmtdAll = txs.filter(t => t.card===cardName && !t.statementd);
-    const pendingAll  = unstmtdAll.filter(t => t.pending);
-    const confAll     = unstmtdAll.filter(t => !t.pending);
+  const cardsHtml = cardsData.map(([cardName, d]) => {
+    const cn = esc(cardName), accent = CARD_ACCENT[cardName] || 'var(--w2)';
+    const pts = (d.card.points||0).toLocaleString();
 
-    // Expenses/installments (charged to card)
-    const pending   = pendingAll.filter(t => OUT_TYPES.has(t.type));
-    const confirmed = confAll.filter(t => OUT_TYPES.has(t.type));
+    // Unbilled + pending/confirmed bar
+    const pW = Math.max(0, d.pendAmt), cW = Math.max(0, d.confAmt), tW = pW + cW;
+    const unbilled = (d.pend.length || d.conf.length) ? `
+      <div class="ccx-big">${fmt(d.unbilled)}</div>
+      ${tW > 0 ? `<div class="ccx-bar"><span style="width:${(pW/tW*100).toFixed(1)}%;background:#f59e0b"></span><span style="width:${(cW/tW*100).toFixed(1)}%;background:var(--w3)"></span></div>` : ''}
+      <div class="ccx-split">
+        ${d.pend.length ? `<span><b style="color:#f59e0b">● Pending</b> ${fmt(d.pendAmt)} <i>· ${d.pend.length}</i></span>` : ''}
+        ${d.conf.length ? `<span><b>○ Confirmed</b> ${fmt(d.confAmt)} <i>· ${d.conf.length}</i></span>` : ''}
+      </div>`
+      : `<div class="ccx-big" style="color:var(--w3)">${fmt(0)}</div><div class="ccx-split"><span>Everything is on a statement</span></div>`;
 
-    // Credits that reduce the balance (cashback, refunds — type Gain)
-    const pendCredits = pendingAll.filter(t => !OUT_TYPES.has(t.type));
-    const confCredits = confAll.filter(t => !OUT_TYPES.has(t.type));
-
-    // Net amounts (expenses minus credits)
-    const pendAmt  = pending.reduce((s,t)=>s+t.amount,0)   - pendCredits.reduce((s,t)=>s+t.amount,0);
-    const confAmt  = confirmed.reduce((s,t)=>s+t.amount,0) - confCredits.reduce((s,t)=>s+t.amount,0);
-    const totalOwing = pendAmt + confAmt;
-    const pts      = (card.points||0).toLocaleString();
-    const cn       = esc(cardName);
-
-    // Outstanding section
-    const outCells = [];
-    if (pending.length)   outCells.push(`<div class="cc-out-cell"><div class="cc-out-cell-lbl" style="color:#f59e0b">● Pending</div><div class="cc-out-cell-val" style="color:#f59e0b">${fmt(pendAmt)}</div><div class="cc-out-cell-sub">${pending.length} txn${pending.length!==1?'s':''}</div></div>`);
-    if (confirmed.length) outCells.push(`<div class="cc-out-cell"><div class="cc-out-cell-lbl" style="color:var(--w2)">○ Confirmed</div><div class="cc-out-cell-val" style="color:var(--w2)">${fmt(confAmt)}</div><div class="cc-out-cell-sub">${confirmed.length} txn${confirmed.length!==1?'s':''}</div></div>`);
-
-    const outSection = outCells.length
-      ? `<div class="cc-out-grid">${outCells.join('')}<div class="cc-out-total"><div class="cc-out-total-lbl">Total owing</div><div class="cc-out-total-val">${fmt(totalOwing)}</div></div></div>`
-      : `<div style="font-size:12px;color:var(--w3)">Nothing outstanding — all transactions are statemeneted.</div>`;
-
-    // Statements — collapsible, shows only unpaid by default
-    initCCStmt();
-    const stmts    = (card.statements||[]).slice().sort((a,b) => (b.statementDate||'').localeCompare(a.statementDate||''));
-    const unpaid   = stmts.filter(s => !s.paid);
-    const paid     = stmts.filter(s =>  s.paid);
-    const isOpen   = ccStmtOpen.has(cardName);
-    const showPaid = ccShowPaid.has(cardName);
-
-    const makeStmtRow = s => {
-      const sid = esc(s.id);
-      const due = dueLblCC(s.dueDate, s.paid);
-      return `<div class="cc-stmt">
-        <span class="cc-stmt-date">${fmtDay(s.statementDate)}</span>
-        <span class="cc-stmt-amt">${fmt(s.amount)}</span>
-        <span class="cc-stmt-due ${due.cls}">${due.text}</span>
-        <span class="cc-stmt-paid" onclick="togglePaid('${cn}','${sid}')">
-          ${s.paid ? '<span style="color:#4ade80">● Paid</span>' : '<span style="color:var(--w3)">○ Unpaid</span>'}
-        </span>
-        <button class="del-btn" onclick="deleteStatement('${cn}','${sid}')">×</button>
-      </div>`;
-    };
-
-    let stmtBody = '';
-    if (isOpen) {
-      if (!stmts.length) {
-        stmtBody = `<div class="cc-no-stmt">No statements yet — click + Add.</div>`;
-      } else {
-        stmtBody += unpaid.length
-          ? unpaid.map(makeStmtRow).join('')
-          : `<div class="cc-no-stmt">No open statements — all paid.</div>`;
-        if (paid.length) {
-          stmtBody += `<div class="cc-show-paid" onclick="toggleCCPaid('${cn}')">
-            ${showPaid
-              ? '▾ Hide paid statements'
-              : `▸ ${paid.length} paid statement${paid.length>1?'s':''}`}
-          </div>`;
-          if (showPaid) stmtBody += paid.map(makeStmtRow).join('');
-        }
-      }
-    }
-
-    const badge = unpaid.length
-      ? `<span style="color:#f59e0b;margin-left:6px;font-weight:700">${unpaid.length} open</span>`
-      : (stmts.length ? `<span style="color:#4ade80;margin-left:6px">all paid</span>` : '');
-
-    return `<div class="cc-section">
-      <div class="cc-head">
-        <span class="cc-head-name">${esc(cardName)}</span>
-        <div class="cc-head-pts">
-          <span class="cc-pts-lbl">Points</span>
-          <span class="cc-pts-val" id="cc-pts-${cn.replace(/ /g,'-')}">${pts}</span>
-          <button class="btn" style="padding:3px 8px;font-size:11px" onclick="editPoints('${cn}')">✎</button>
+    // Unpaid statements → highlighted callouts
+    const due = d.unpaid.map(st => {
+      const lbl = st.dueDate ? ccCountdown(st.dueDate) : { cls:'ok', text:'no due date' };
+      return `<div class="ccx-due ${lbl.cls==='overdue'?'over':''}">
+        <div class="ccx-due-l">
+          <div class="ccx-k">Statement · ${fmtSho(st.statementDate)}</div>
+          <div class="ccx-due-amt">${fmt(st.amount)}</div>
+          <div class="ccx-due-when ${lbl.cls}">${st.dueDate ? 'Due ' + fmtSho(st.dueDate) + ' · ' : ''}${lbl.text}</div>
         </div>
+        <button class="ccx-paybtn" onclick="togglePaid('${cn}','${esc(st.id)}')">Mark paid</button>
+      </div>`;
+    }).join('');
+
+    // Paid statements → collapsible history
+    const histOpen = ccStmtOpen.has(cardName);
+    const history = d.paid.length ? `
+      <div class="ccx-hist-head" onclick="toggleCCStmt('${cn}')">${histOpen?'▾':'▸'} History <i>${d.paid.length}</i></div>
+      ${histOpen ? d.paid.map(st => `<div class="ccx-hrow">
+          <span class="ccx-hdate">${fmtDay(st.statementDate)}</span>
+          <span class="ccx-hamt">${fmt(st.amount)}</span>
+          <span class="ccx-hpaid" onclick="togglePaid('${cn}','${esc(st.id)}')" title="Mark unpaid">● Paid</span>
+          <button class="del-btn" onclick="deleteStatement('${cn}','${esc(st.id)}')" title="Delete">×</button>
+        </div>`).join('') : ''}` : '';
+
+    return `<div class="ccx-card" style="--accent:${accent}">
+      <div class="ccx-head">
+        <span class="ccx-name"><span class="ccx-dot"></span>${esc(cardName)}</span>
+        <span class="ccx-pts" onclick="editPoints('${cn}')" title="Edit points">★ <span id="cc-pts-${cn.replace(/ /g,'-')}">${pts}</span> pts ✎</span>
       </div>
-      <div class="cc-outstanding">
-        <div class="cc-out-lbl">Outstanding (not statemeneted)</div>
-        ${outSection}
+      <div class="ccx-body">
+        ${due}
+        <div class="ccx-k"${due ? ' style="margin-top:16px"' : ''}>Unbilled <span>· not yet on a statement</span></div>
+        ${unbilled}
       </div>
-      <div class="cc-stmts-head" onclick="toggleCCStmt('${cn}')">
-        <span class="cc-stmts-lbl">${isOpen ? '▾' : '▸'} Statements${badge}</span>
-        <button class="btn" style="padding:4px 10px;font-size:11px" onclick="event.stopPropagation();openAddStatement('${cn}')">+ Add</button>
+      <div class="ccx-foot">
+        ${history || '<span class="ccx-nohist">No past statements</span>'}
+        <button class="ccx-add" onclick="openAddStatement('${cn}')">+ Add statement</button>
       </div>
-      ${stmtBody}
     </div>`;
   }).join('');
+
+  el.innerHTML = summary + `<div class="ccx-grid">${cardsHtml}</div>`;
 }
 
 // ── Points inline edit ──────────────────────────────────────────
