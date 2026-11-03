@@ -1313,10 +1313,10 @@ let chartDrillCat = null; // null = overview, string = drilled category
 
 // Monthly Expenses rules:
 //  • A period runs from one Salary transaction to the next; titled by the salary's month.
-//  • Card Payment and Investments are not spending → excluded.
+//  • Installment, Card Payment and Investments are not monthly spending → excluded (shown in Total transactions).
 //  • Refunds/cashback (type Gain) under a spending category reduce that category.
 //  • Income = Salary + Interest.
-const MX_EXCLUDE = new Set(['Card Payment','Investments']);
+const MX_EXCLUDE = new Set(['Card Payment','Investments','Installment']);
 const MX_INCOME  = new Set(['Salary','Interest']);
 const mxSigned   = t => OUT_TYPES.has(t.type) ? t.amount : -t.amount;   // spend +, refund −
 
@@ -1416,7 +1416,8 @@ function renderChart() {
   const income   = period.salary + period.interest;
   const cardPay  = period.excluded['Card Payment'] || 0;
   const invest   = period.excluded['Investments']  || 0;
-  const allOut   = total + cardPay + invest;
+  const instal   = period.excluded['Installment']  || 0;
+  const allOut   = total + cardPay + invest + instal;
   const salBar = income > 0 ? `
     <div class="sal-bar">
       <div class="sal-cell">
@@ -1431,7 +1432,7 @@ function renderChart() {
       <div class="sal-cell">
         <div class="sal-lbl">Total transactions</div>
         <div class="sal-val" style="color:#f43f5e">− ${fmt(allOut)}</div>
-        <div style="font-size:10px;color:var(--w3);margin-top:3px">Spent ${fmt(total)} · Card Payment ${fmt(cardPay)} · Investments ${fmt(invest)}</div>
+        <div style="font-size:10px;color:var(--w3);margin-top:3px">Spent ${fmt(total)} · Installment ${fmt(instal)} · Card Payment ${fmt(cardPay)} · Investments ${fmt(invest)}</div>
       </div>
     </div>` : '';
 
@@ -1456,7 +1457,7 @@ function renderChart() {
         </div>
       </div>
       <div class="chart-legend-col">
-        <div class="chart-legend-head">Spending by category · refunds netted · excludes Card Payment &amp; Investments</div>
+        <div class="chart-legend-head">Spending by category · refunds netted · excludes Installment, Card Payment &amp; Investments</div>
         ${legendRows}
         <div class="chart-total-row"><div></div><div class="leg-label">Total spent</div><div class="leg-pct">100%</div><div class="leg-amt" style="color:#f43f5e">${fmt(total)}</div></div>
       </div>
